@@ -14,7 +14,8 @@ Cập nhật lần cuối: **30/10/2026 (Asia/Bangkok)**. Đây là nhật ký t
 | Hạng mục | Trạng thái | Ghi chú |
 |---|---|---|
 | Bản demo local M0–M6 | **DONE** | Pipeline, dashboard, tài liệu và kiểm tra đã hoàn thành. |
-| Sắp xếp thư mục và Git local | **IN PROGRESS** | Code/notebook đã chuyển; Git đã init và stage; chờ đóng Excel để chuyển file timeline gốc. |
+| Git local | **DONE** | Repository đã init; commit đầu `242a873`; chưa cấu hình remote. |
+| Dọn file phiên bản cũ | **BLOCKED** | Hai tài liệu đã chuyển; chờ đóng Excel để chuyển file timeline gốc. |
 | Triển khai công khai | **PENDING** | Chưa nằm trong phạm vi demo; hiện chạy trên máy local. |
 | Sử dụng để chạy campaign thật | **BLOCKED** | Cần xác minh timing/đơn vị feature, dữ liệu chi phí và thiết kế pilot được phê duyệt. |
 
@@ -49,7 +50,7 @@ Cập nhật lần cuối: **30/10/2026 (Asia/Bangkok)**. Đây là nhật ký t
 | 29/10/2026 | M0 | `PENDING` → `DONE` | Khóa scope 20 giờ và quyết định dùng một pipeline thay cho ba tầng vật lý. |
 | 30/10/2026 | M1–M3 | `PENDING` → `DONE` | QA raw, EDA, nested 3-fold OOF scoring và artifact dữ liệu. |
 | 30/10/2026 | M4–M6 | `PENDING` → `DONE` | Dashboard bốn trang, policy matrix, tài liệu và kiểm tra tự động/giao diện. |
-| 30/10/2026 | Sắp xếp & Git | `PENDING` → `IN PROGRESS` | Code vào `work/`, notebook vào `work/pipeline/`, hai tài liệu cũ vào `Documents/back`; timeline bị Excel khóa. Git local đã init và stage, chưa có remote. |
+| 30/10/2026 | Sắp xếp & Git | `PENDING` → `DONE` cho code/Git; `BLOCKED` cho timeline | Code vào `work/`, notebook vào `work/pipeline/`, hai tài liệu cũ vào `Documents/back`; Git commit đầu `242a873`, chưa có remote. Timeline gốc bị Excel khóa. |
 
 ### Mẫu ghi cho mốc tiếp theo
 
