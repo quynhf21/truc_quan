@@ -4,4 +4,3 @@ build/
 catboost_info/
 .venv/
 ~$*.xlsx
-timeline (1).xlsx

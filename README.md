@@ -68,4 +68,4 @@ Ba outer folds tạo dự đoán ngoài mẫu cho toàn bộ khách hàng. Trong
 ## Tài liệu
 
 - [M0_project_contract.md](M0_project_contract.md): phạm vi rút gọn và quyết định cohort.
-- Tài liệu phiên bản cũ (`project_context (1).md`, `analysis_pipeline (1).md`) đã chuyển ngoài repository vào `C:\Users\Admin\Documents\back`. `timeline (1).xlsx` có bản sao cùng kích thước ở đó; file gốc đang bị Excel khóa và sẽ được chuyển sau khi đóng workbook.
+- Tài liệu phiên bản cũ (`project_context (1).md`, `analysis_pipeline (1).md`, `timeline (1).xlsx`) đã chuyển ngoài repository vào `C:\Users\Admin\Documents\back`.

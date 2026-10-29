@@ -15,7 +15,7 @@ Cập nhật lần cuối: **30/10/2026 (Asia/Bangkok)**. Đây là nhật ký t
 |---|---|---|
 | Bản demo local M0–M6 | **DONE** | Pipeline, dashboard, tài liệu và kiểm tra đã hoàn thành. |
 | Git local | **DONE** | Repository đã init; commit đầu `242a873`; chưa cấu hình remote. |
-| Dọn file phiên bản cũ | **BLOCKED** | Hai tài liệu đã chuyển; chờ đóng Excel để chuyển file timeline gốc. |
+| Dọn file phiên bản cũ | **DONE** | Ba file cũ nằm tại `C:\Users\Admin\Documents\back`; root dự án không còn timeline. |
 | Triển khai công khai | **PENDING** | Chưa nằm trong phạm vi demo; hiện chạy trên máy local. |
 | Sử dụng để chạy campaign thật | **BLOCKED** | Cần xác minh timing/đơn vị feature, dữ liệu chi phí và thiết kế pilot được phê duyệt. |
 
@@ -41,7 +41,6 @@ Cập nhật lần cuối: **30/10/2026 (Asia/Bangkok)**. Đây là nhật ký t
 | `BLOCKED` cho đánh giá chính sách | Chưa có treatment/control, outcome window, contact/offer cost, margin/CLV và uplift | Thiết kế pilot, thu thập dữ liệu và phê duyệt KPI/guardrail. |
 | `PENDING` tùy chọn | Deploy dashboard, phân quyền và bảo vệ dữ liệu khách hàng | Chỉ thực hiện nếu có yêu cầu host bên ngoài và phương án truy cập dữ liệu phù hợp. |
 | `PENDING` tùy chọn | Kiểm định theo thời gian, fairness và drift trước sử dụng thật | Cần snapshot mới và định nghĩa kiểm tra vận hành. |
-| `BLOCKED` cho dọn phiên bản cũ | `timeline (1).xlsx` còn trong root vì Excel đang khóa file | Lưu và đóng workbook trong Excel, sau đó chuyển file gốc vào `C:\Users\Admin\Documents\back`. Đã có bản sao cùng kích thước ở archive, chưa đối chiếu hash được khi file gốc bị khóa. |
 
 ## Nhật ký cập nhật
 
@@ -51,6 +50,7 @@ Cập nhật lần cuối: **30/10/2026 (Asia/Bangkok)**. Đây là nhật ký t
 | 30/10/2026 | M1–M3 | `PENDING` → `DONE` | QA raw, EDA, nested 3-fold OOF scoring và artifact dữ liệu. |
 | 30/10/2026 | M4–M6 | `PENDING` → `DONE` | Dashboard bốn trang, policy matrix, tài liệu và kiểm tra tự động/giao diện. |
 | 30/10/2026 | Sắp xếp & Git | `PENDING` → `DONE` cho code/Git; `BLOCKED` cho timeline | Code vào `work/`, notebook vào `work/pipeline/`, hai tài liệu cũ vào `Documents/back`; Git commit đầu `242a873`, chưa có remote. Timeline gốc bị Excel khóa. |
+| 30/10/2026 | Kho phiên bản cũ | `BLOCKED` → `DONE` | Xác minh `Documents/back` có đủ ba file và root dự án không còn timeline/file khóa tạm. |
 
 ### Mẫu ghi cho mốc tiếp theo
 
