@@ -27,7 +27,7 @@ def main():
     assert sum(mart.groupby("PrioritySegment").size()) == len(mart)
     assert np.isclose(roc_auc_score(mart.Churn, mart.RiskScore), model["roc_auc"])
     assert policy.ReasonCode.is_unique and set(mart.ReasonCode.unique()) == set(policy.ReasonCode)
-    import dashboard
+    import dashboard_v1 as dashboard
     for route in ("/", "/drivers", "/risk", "/strategy"):
         assert dashboard.render_page(route, None, None, None, None)
         assert dashboard.render_page(route, ["12–18 tháng"], ["No"], None, [9, 10])

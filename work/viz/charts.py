@@ -148,7 +148,7 @@ def churn_donut(df: pd.DataFrame) -> go.Figure:
     fig.add_annotation(text=f"<b>{fmt_pct(k['rate'])}</b><br>churn", showarrow=False, font=dict(size=20, color=INK))
     one_in = 1 / k["rate"] if k["rate"] else float("nan")
     return apply_style(fig, f"Cứ khoảng {fmt_ratio(one_in)} khách thì có 1 khách rời bỏ",
-                       f"{fmt_n(k['churners'])} / {fmt_n(k['customers'])} khách", height=340)
+                       f"{fmt_n(k['churners'])} / {fmt_n(k['customers'])} khách", height=460)
 
 
 def missing_bar(df: pd.DataFrame, columns) -> go.Figure:
@@ -224,14 +224,15 @@ def tenure_line(df: pd.DataFrame, max_month=48) -> go.Figure:
     return fig
 
 
-def rate_bar(df: pd.DataFrame, col: str, label: str, order=None, horizontal=False, title=None, min_n=MIN_N) -> go.Figure:
+def rate_bar(df: pd.DataFrame, col: str, label: str, order=None, horizontal=False, title=None, min_n=MIN_N,
+             base=None) -> go.Figure:
     """Bar churn rate theo nhóm, có baseline; nhóm trên trung bình tô đỏ."""
     table = rate_by(df, col, order=order, min_n=min_n)
     if table.empty:
         return empty_figure()
     if order is None:
         table = table.sort_values("rate", ascending=horizontal)
-    base = baseline(df)
+    base = baseline(df) if base is None else base
     colors = [CHURN if r > base else STAY for r in table.rate]
     labels = table[col].astype(str)
     text = [fmt_pct(r) for r in table.rate]
@@ -384,7 +385,7 @@ def region_bar(df: pd.DataFrame, min_n=800) -> go.Figure:
         return empty_figure()
     hi, lo = table.loc[table.rate.idxmax()], table.loc[table.rate.idxmin()]
     gap = 100 * (hi.rate - lo.rate)
-    return rate_bar(df[df.Region.isin(table.Region)], "Region", "Vùng", horizontal=True,
+    return rate_bar(df[df.Region.isin(table.Region)], "Region", "Vùng", horizontal=True, base=baseline(df),
                     title=f"Vùng {hi.Region} churn {fmt_pct(hi.rate)}, cao hơn {lo.Region} {fmt_ratio(gap)} điểm %")
 
 
