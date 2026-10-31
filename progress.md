@@ -27,7 +27,7 @@ Cập nhật lần cuối: **30/10/2026 (Asia/Bangkok)**. Đây là nhật ký t
 | **M0 — Khóa phạm vi và hợp đồng dữ liệu** | **DONE** | `project_contract.md`; raw 51.047 dòng/58 cột, target và hai cohort complete-case đã đối soát; khóa 9 câu hỏi và 4 trang. |
 | **M1 — Làm sạch và QA nguồn** | **DONE** | `work/pipeline/01_data_preparation_and_eda.ipynb` đọc raw, chuẩn hóa `NA`/target/category, kiểm tra ID, missing, giá trị âm và xuất processed layer; tái tạo 51.047 khách và 14.711 churner. |
 | **M2 — EDA và insight trực quan** | **DONE** | `work/pipeline/02_analysis_and_visualization.ipynb` phân tích tenure, thiết bị, value/phí, usage; mỗi phần có biểu đồ risk/reach, giải thích và kết luận. |
-| **M3 — Mô hình và risk decile** | **DONE** | `work/pipeline/03_model_training_and_evaluation.ipynb` dùng đúng 10 feature, tạo OOF score cho 51.047 khách; ROC-AUC 0,6715 và lift@10% 1,88×. |
+| **M3 — Mô hình và risk decile** | **DONE** | `work/pipeline/03_model_training_and_evaluation.ipynb` v2 dùng 52 cột nguồn (31/10/2026), tạo OOF score cho 51.047 khách; ROC-AUC 0,6816 và lift@10% 1,93× (v1 10 feature: 0,6715). |
 | **M4 — Web dashboard BI** | **DONE** | `work/dashboard/dashboard.py` và `work/dashboard/assets/style.css`: bốn trang, bộ lọc chung, reset, capacity và diễn giải. |
 | **M5 — Chính sách giữ chân** | **DONE** | `build/policy_matrix.csv` và trang Strategy: ba hướng ưu tiên pilot, nhóm plan review để khám phá thêm, fallback; có KPI, guardrail và khung treatment/control. |
 | **M6 — Đối soát, tài liệu và demo readiness** | **DONE** | `work/dashboard/verify.py` pass đối soát nguồn/score/segment/policy và render bốn route, kể cả lát cắt sau lọc. |

@@ -122,12 +122,12 @@ Vì nhóm "Rủi ro cao (mô hình)" dựa trên `RiskDecile ≥ 8`, số khách
 
 ## 3. Definition of Done
 
-- [ ] `compare_models.py --quick`: D lớn hơn A ít nhất 0,005 AUC.
-- [ ] `model_metrics.json`: `model_version` = `cell2cell-catboost-oof-v2`, có `features` gồm 52 cột, `roc_auc` ≈ 0,68.
-- [ ] `verify_notebooks.py`, `verify.py`, `smoke_test.py` đều PASS; notebook 04 chạy không lỗi.
-- [ ] Trong `git diff`, notebook 01–02 không đổi.
-- [ ] Mọi file ở bước 3 không còn số AUC 0,67 hay chữ "10 feature" khi nói về mô hình (`git grep -n "0,67\|10 feature"`).
-- [ ] Commit `T9: CatBoost 52 cột (AUC 0,672 → <số mới>)`, push lên branch của PR này.
+- [x] `compare_models.py --quick`: D lớn hơn A ít nhất 0,005 AUC.
+- [x] `model_metrics.json`: `model_version` = `cell2cell-catboost-oof-v2`, có `features` gồm 52 cột, `roc_auc` ≈ 0,68.
+- [x] `verify_notebooks.py`, `verify.py`, `smoke_test.py` đều PASS; notebook 04 chạy không lỗi.
+- [x] Trong `git diff`, notebook 01–02 không đổi.
+- [x] Mọi file ở bước 3 không còn số AUC 0,67 hay chữ "10 feature" khi nói về mô hình (`git grep -n "0,67\|10 feature"`).
+- [x] Commit `T9: CatBoost 52 cột (AUC 0,672 → <số mới>)`, push lên branch của PR này.
 
 ## 4. Không làm
 
@@ -143,3 +143,10 @@ Vì nhóm "Rủi ro cao (mô hình)" dựa trên `RiskDecile ≥ 8`, số khách
 ở bước 0 và 2 (dán số AUC). Nếu một lệnh lỗi hoặc AUC lệch kỳ vọng thì dừng và báo, không tự sửa vòng vo.
 Xong thì tick DoD, commit và push lên branch hiện tại.
 ```
+
+## 6. Kết quả (31/10/2026)
+
+Đã làm xong T9. `model_metrics.json` v2: ROC-AUC **0,6816** (fold 0,678 / 0,683 / 0,684), PR-AUC 0,4624,
+log loss 0,5564, lift top 10% 1,93×, gọi 20% khách bắt được 34,1% churner. Depth chọn 6 / 6 / 4.
+`verify.py`, `smoke_test.py`, audit + guard notebook 02–03 đều PASS. `verify_notebooks.py` báo lỗi ở notebook 01
+(execution count bắt đầu từ 2): lỗi này có sẵn trên master trước T9, notebook 01 không bị sửa.

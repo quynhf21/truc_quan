@@ -55,7 +55,7 @@ Tập 49.752 của tài liệu hiện tại là complete-case trên **toàn bộ
 
 ## 5. Phạm vi feature và mô hình
 
-Mô hình chính chỉ nhận: `MonthsInService`, `CurrentEquipmentDays`, `HandsetWebCapable`, `MonthlyRevenue`, `TotalRecurringCharge`, `CreditRating`, `MonthlyMinutes`, `PercChangeMinutes`, `PercChangeRevenues`, `PeakCallsInOut`.
+Mô hình chính (v2, đổi ngày 31/10/2026) nhận mọi cột của raw CSV trừ `CustomerID`, `Churn`, `ServiceArea` và 3 trường retention: 52 cột. Lý do: so sánh trong `work/experiments/compare_models.py` cho AUC 0,672 → 0,681. Notebook 01 vẫn chuẩn hóa 10 base feature (`MonthsInService`, `CurrentEquipmentDays`, `HandsetWebCapable`, `MonthlyRevenue`, `TotalRecurringCharge`, `CreditRating`, `MonthlyMinutes`, `PercChangeMinutes`, `PercChangeRevenues`, `PeakCallsInOut`); notebook 03 ghép thêm các cột còn lại từ raw CSV đã xác nhận SHA256.
 
 `CustomerID` chỉ dùng để ghép kết quả. Các trường retention contact/offer và `ServiceArea` không vào mô hình. Missing được xử lý trong pipeline huấn luyện, học quy tắc từ train fold và áp dụng cho validation/holdout; báo số khách không thể chấm điểm nếu còn. Risk score, decile và lift để trình bày phải dựa trên dự đoán cho dòng chưa dùng fit model. Tối thiểu báo ROC-AUC, PR-AUC, log loss, calibration và lift@5/10/20%.
 
