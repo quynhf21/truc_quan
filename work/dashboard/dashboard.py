@@ -1,23 +1,29 @@
-"""Dashboard BI churn Cell2Cell (4 trang). Chạy work/viz/prepare_viz_data.py trước, rồi: python work/dashboard/dashboard.py"""
+"""Bảng điều khiển Cell2Cell, đọc bộ kết quả do notebook 04 xuất ra."""
 
 from __future__ import annotations
 
-import sys
+from datetime import datetime
 from pathlib import Path
+import sys
 
 import pandas as pd
+import plotly.graph_objects as go
+import plotly.io as pio
 from dash import Dash, Input, Output, dcc, html
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "work" / "viz"))
 import charts as c  # noqa: E402
 
-DATA_PATH = ROOT / "work" / "build" / "viz_customers.parquet"
-if not DATA_PATH.exists():
-    raise SystemExit("Chưa có dữ liệu dashboard. Hãy chạy: python work/viz/prepare_viz_data.py")
+RESULTS_DIR = ROOT / "work" / "build" / "dashboard"
+DATA_PATH = RESULTS_DIR / "customers.parquet"
+if not DATA_PATH.is_file():
+    raise SystemExit("Chưa có kết quả dashboard. Hãy chạy toàn bộ notebook work/viz/04_eda_truc_quan.ipynb.")
 DATA = pd.read_parquet(DATA_PATH)
+NOTEBOOK_FIGURES = {path.stem: pio.read_json(path) for path in (RESULTS_DIR / "figures").glob("*.json")}
 COMPANY = c.kpis(DATA)
 HAS_RISK = "RiskDecile" in DATA
+UPDATED_AT = datetime.fromtimestamp(DATA_PATH.stat().st_mtime).strftime("%d/%m/%Y %H:%M")
 
 FILTERS = [
     ("tenure", "Thời gian sử dụng", "TenureBand"),
@@ -25,197 +31,209 @@ FILTERS = [
     ("equipment", "Tuổi thiết bị", "EquipmentAgeBand"),
     ("credit", "Hạng tín dụng", "CreditRating"),
 ]
-
 PAGES = [
-    ("/", "Tổng quan", "Churn lớn đến đâu và mất bao nhiêu doanh thu?"),
-    ("/nguyen-nhan", "Nguyên nhân", "Tín hiệu nào đi cùng khách rời bỏ?"),
-    ("/rui-ro", "Chân dung & rủi ro", "Ai đang có nguy cơ rời bỏ?"),
-    ("/hanh-dong", "Hành động", "Giữ ai, bằng cách nào?"),
+    ("/", "Tổng quan"),
+    ("/nguyen-nhan", "Thiết bị và dịch vụ"),
+    ("/rui-ro", "Hồ sơ và rủi ro"),
+    ("/hanh-dong", "Phân khúc khách hàng"),
 ]
-
-POLICIES = {
-    "Đã báo động": ("Thiết kế lại ưu đãi giữ chân; chuyên viên cấp cao xử lý trong 24h; ghi nhận lý do rời bỏ.",
-                    "Churn 60 ngày · tỷ lệ nhận ưu đãi"),
-    "Hết hợp đồng": ("Gọi chăm sóc chủ động từ tháng 10; ưu đãi gia hạn 12 tháng trước tháng 11.",
-                     "Tỷ lệ gia hạn · churn tháng 11–13"),
-    "Máy cũ": ("Đổi máy smartphone trả góp/trợ giá gắn cam kết 12 tháng; ưu tiên máy không hỗ trợ web.",
-               "% nhận đổi máy · churn 90 ngày · chi phí/khách giữ được"),
-    "Rủi ro cao (mô hình)": ("Khảo sát hài lòng và tư vấn gói phù hợp; ưu đãi cá nhân hóa cho khách giá trị cao.",
-                             "Churn 90 ngày · doanh thu giữ được"),
-    "Ổn định": ("Duy trì chất lượng, chương trình khách hàng thân thiết.", "Theo dõi định kỳ"),
+CHART_TITLES = {
+    "C01_ty_le_churn": "Cơ cấu khách hàng",
+    "C05_vong_doi": "Tỷ lệ rời bỏ và số khách theo tháng sử dụng",
+    "C06_tuoi_thiet_bi": "Tỷ lệ rời bỏ theo tuổi thiết bị",
+    "C07_heatmap_tenure_thiet_bi": "Tỷ lệ rời bỏ theo thời gian sử dụng và tuổi thiết bị",
+    "C08_retention_funnel": "Liên hệ và ưu đãi giữ chân",
+    "C09_dac_diem_thiet_bi": "Tỷ lệ rời bỏ theo đặc điểm thiết bị",
+    "C10_goi_cskh": "Tỷ lệ rời bỏ theo cuộc gọi chăm sóc khách hàng",
+    "C11_cuoc_goi_rot": "Tỷ lệ rời bỏ theo cuộc gọi rớt hoặc bị chặn",
+    "C12_goi_cuoc": "Tỷ lệ rời bỏ theo mức sử dụng và phút vượt gói",
+    "C13_vung": "Tỷ lệ rời bỏ theo vùng",
+    "C14_treemap_vung": "Số khách rời bỏ theo vùng và thời gian sử dụng",
+    "C16_tin_dung": "Tỷ lệ rời bỏ theo hạng tín dụng",
+    "C17_nhan_khau_hoc": "Tỷ lệ rời bỏ theo đặc điểm khách hàng",
+    "C19a_risk_decile": "Tỷ lệ rời bỏ theo nhóm rủi ro",
+    "C19b_gain_curve": "Tỷ lệ khách rời bỏ được xác định theo phạm vi liên hệ",
+    "C20_phan_khuc": "Tỷ lệ rời bỏ và doanh thu theo phân khúc",
 }
+missing_figures = set(CHART_TITLES) - NOTEBOOK_FIGURES.keys()
+if missing_figures:
+    raise SystemExit("Kết quả biểu đồ chưa đầy đủ. Hãy chạy toàn bộ notebook 04.")
 
 
-def options(col):
-    values = DATA[col]
-    if hasattr(values, "cat"):
-        items = [v for v in values.cat.categories if v in set(values)]
-    elif col == "CreditRating":
-        items = [v for v in c.CREDIT_ORDER if v in set(values)]
+def options(column):
+    values = DATA[column]
+    if isinstance(values.dtype, pd.CategoricalDtype):
+        items = [value for value in values.cat.categories if value in set(values)]
+    elif column == "CreditRating":
+        items = [value for value in c.CREDIT_ORDER if value in set(values)]
     else:
         items = sorted(values.dropna().unique())
-    return [{"label": str(v), "value": str(v)} for v in items]
+    return [{"label": c.display_value(column, value), "value": str(value)} for value in items]
 
 
-def apply_filters(values) -> pd.DataFrame:
-    df = DATA
-    for (_, _, col), selected in zip(FILTERS, values):
+def apply_filters(values):
+    data = DATA
+    for (_, _, column), selected in zip(FILTERS, values):
         if selected:
-            df = df[df[col].astype(str).isin(selected)]
-    return df
+            data = data[data[column].astype(str).isin(selected)]
+    return data
 
 
-# ---------- thành phần giao diện ----------
-
-def kpi(label, value, delta=None, good_when_negative=True, note=""):
+def kpi(label, value, delta=None, note=""):
     children = [html.Div(label, className="kpi-label"), html.Div(value, className="kpi-value")]
     if delta is not None:
-        worse = delta > 0 if good_when_negative else delta < 0
-        arrow = "▲" if delta > 0 else ("▼" if delta < 0 else "■")
-        children.append(html.Div(f"{arrow} {c.fmt_ratio(abs(100 * delta))} điểm % so với toàn công ty",
-                                 className="kpi-delta " + ("bad" if worse else "good")))
+        arrow = "▲" if delta > 0 else ("▼" if delta < 0 else "—")
+        children.append(html.Div(
+            f"{arrow} {c.fmt_ratio(abs(100 * delta))} điểm % so với toàn bộ khách",
+            className="kpi-delta " + ("bad" if delta > 0 else "good"),
+        ))
     if note:
         children.append(html.Div(note, className="kpi-note"))
     return html.Div(children, className="kpi")
 
 
-def rate_kpi(label, part: pd.DataFrame, note=""):
-    if not len(part):
-        return kpi(label, "–", note="Không có khách trong lát cắt")
-    rate = c.baseline(part)
-    return kpi(label, c.fmt_pct(rate), rate - COMPANY["rate"], note=note or f"n = {c.fmt_n(len(part))}")
+def rate_kpi(label, data):
+    if data.empty:
+        return kpi(label, "—", note="0 khách")
+    rate = c.baseline(data)
+    return kpi(label, c.fmt_pct(rate), rate - COMPANY["rate"], note=f"{c.fmt_n(len(data))} khách")
 
 
-def graph(fig, wide=False):
-    return html.Div(dcc.Graph(figure=fig, config={"displaylogo": False, "responsive": True,
-                                                   "displayModeBar": "hover", "modeBarButtons": [["toImage"]],
-                                                   "toImageButtonOptions": {"scale": 2}}),
-                    className="panel" + (" wide" if wide else ""))
+def graph(key, data, wide=False):
+    # Toàn bộ dữ liệu dùng nguyên biểu đồ đã xuất; lát cắt dùng bản dữ liệu của cùng lần chạy.
+    figure = go.Figure(NOTEBOOK_FIGURES[key]) if len(data) == len(DATA) else c.FIGURES[key](data)
+    figure.update_layout(title={"text": None}, margin={"l": 16, "r": 20, "t": 36, "b": 52})
+    complex_chart = key in {"C08_retention_funnel", "C17_nhan_khau_hoc"}
+    return html.Section([
+        html.H2(CHART_TITLES[key], className="chart-title"),
+        html.Div(dcc.Graph(
+            figure=figure,
+            config={"displaylogo": False, "responsive": True, "displayModeBar": "hover",
+                    "modeBarButtons": [["toImage"]], "toImageButtonOptions": {"scale": 2}},
+            responsive=True,
+        ), className="chart-scroll", tabIndex=0 if complex_chart else None,
+            role="region", **{"aria-label": CHART_TITLES[key]}),
+    ], className="panel" + (" wide" if wide else "") + (" complex-chart" if complex_chart else ""),
+        **{"aria-label": CHART_TITLES[key]})
 
 
-def insight_box(figs):
-    titles = [f.layout.title.text.split("<br>")[0].replace("<b>", "").replace("</b>", "") for f in figs]
-    return html.Div([html.Div("Insight chính", className="insight-label"),
-                     html.Ul([html.Li(t) for t in titles if t])], className="insight")
-
-
-def header(path, df):
-    _, name, question = next(p for p in PAGES if p[0] == path)
-    scope = ("Toàn bộ khách hàng" if len(df) == len(DATA)
-             else f"Lát cắt đang lọc: {c.fmt_n(len(df))} / {c.fmt_n(len(DATA))} khách")
-    return html.Div([html.Div(name.upper(), className="eyebrow"), html.H1(question),
-                     html.P(scope, className="scope")], className="page-head")
-
-
-# ---------- 4 trang ----------
-
-def page_overview(df):
-    k = c.kpis(df)
-    cards = html.Div([
-        kpi("Tổng khách hàng", c.fmt_n(k["customers"])),
-        kpi("Khách rời bỏ", c.fmt_n(k["churners"])),
-        kpi("Churn rate", c.fmt_pct(k["rate"]), k["rate"] - COMPANY["rate"] if len(df) != len(DATA) else None,
-            note="Toàn công ty" if len(df) == len(DATA) else ""),
-        kpi("Doanh thu/tháng của khách rời bỏ", c.fmt_money(k["lost_revenue"]),
-            note=f"{c.fmt_pct(k['lost_revenue'] / df.MonthlyRevenue.sum())} tổng doanh thu tháng"),
-        kpi("Thời gian sử dụng TB", f"{c.fmt_ratio(k['tenure_mean'])} tháng"),
-    ], className="kpi-grid five")
-    figs = [c.tenure_line(df), c.churn_donut(df), c.region_bar(df), c.region_treemap(df)]
-    return [cards, insight_box([figs[0], figs[2], figs[3]]),
-            html.Div([graph(figs[0], wide=True), graph(figs[1]), graph(figs[3]), graph(figs[2], wide=True)],
-                     className="grid")]
-
-
-def page_drivers(df):
-    cards = html.Div([
-        rate_kpi("Churn khách máy > 2 năm", df[df.EquipmentAgeBand == ">730 ngày"]),
-        rate_kpi("Churn khách máy không hỗ trợ web", df[df.HandsetWebCapable == "No"]),
-        rate_kpi("Churn khách tháng 11–12", df[df.MonthsInService.between(11, 12)]),
-        rate_kpi("Churn khách không gọi CSKH", df[df.CustomerCareCalls == 0]),
-    ], className="kpi-grid")
-    figs = [
-        c.FIGURES["C06_tuoi_thiet_bi"](df), c.tenure_equipment_heatmap(df), c.device_grouped(df),
-        c.FIGURES["C10_goi_cskh"](df), c.FIGURES["C11_cuoc_goi_rot"](df), c.overage_bubble(df),
-    ]
-    return [cards, insight_box([figs[0], figs[1], figs[3]]),
-            html.Div([graph(f) for f in figs], className="grid")]
-
-
-def page_risk(df):
-    retention = df[df.MadeCallToRetentionTeam == "Yes"]
-    cards = [rate_kpi("Churn khách đã gọi retention", retention),
-             rate_kpi("Churn khách tín dụng hạng 1–3", df[df.CreditRating.isin(c.CREDIT_ORDER[:3])])]
-    if HAS_RISK:
-        high = df[df.RiskDecile >= 8]
-        cards += [kpi("Khách rủi ro cao (decile 8–10)", c.fmt_n(len(high)),
-                      note=f"{c.fmt_pct(len(high) / len(df))} lát cắt"),
-                  rate_kpi("Churn thực tế nhóm rủi ro cao", high)]
-    funnel, credit, demo = c.retention_funnel(df), c.credit_bar(df), c.demographic_multiples(df)
-    risk_figs = [c.decile_bar(df), c.gain_curve(df)] if HAS_RISK else []
-    figs = [funnel, *risk_figs, credit, demo]
-    panels = [graph(funnel, wide=True), *[graph(f) for f in risk_figs], graph(credit), graph(demo, wide=not HAS_RISK)]
-    return [html.Div(cards, className="kpi-grid"), insight_box(figs[:3]), html.Div(panels, className="grid")]
-
-
-def policy_card(row):
-    action, metric = POLICIES.get(str(row.ActionSegment), ("", ""))
-    priority = "priority" if row.ActionSegment != "Ổn định" else "stable"
+def header(path, data):
+    name = dict(PAGES)[path]
     return html.Div([
-        html.Div([html.H3(str(row.ActionSegment)),
-                  html.Span(c.fmt_pct(row.rate), className="badge " + ("bad" if row.rate > COMPANY["rate"] else "good"))],
-                 className="policy-head"),
-        html.Div([html.Span(f"{c.fmt_n(row.n)} khách"), html.Span(f"{c.fmt_money(row.revenue_at_risk)}/tháng bị đe dọa")],
-                 className="policy-stats"),
-        html.P(action, className="policy-action"),
-        html.Div([html.Small("KPI đo: "), html.Span(metric)], className="policy-metric"),
-    ], className="policy-card " + priority)
+        html.H1(name),
+        html.Span(f"{c.fmt_n(len(data))} / {c.fmt_n(len(DATA))} khách", className="scope"),
+    ], className="page-head")
 
 
-def page_action(df):
-    seg = c.segment_summary(df)
-    act = seg[seg.ActionSegment != "Ổn định"]
-    act_rate = act.churners.sum() / act.n.sum() if act.n.sum() else float("nan")
+def page_overview(data):
+    values = c.kpis(data)
+    revenue = data.MonthlyRevenue.sum()
     cards = html.Div([
-        kpi("Khách cần can thiệp", c.fmt_n(act.n.sum()), note=f"{c.fmt_pct(act.n.sum() / len(df))} lát cắt · 4 phân khúc"),
-        kpi("Doanh thu/tháng bị đe dọa", c.fmt_money(act.revenue_at_risk.sum()), note="Σ doanh thu × churn rate của nhóm"),
-        kpi("Churn nhóm cần can thiệp", c.fmt_pct(act_rate) if act.n.sum() else "–",
-            act_rate - COMPANY["rate"] if act.n.sum() else None),
+        kpi("Tổng khách hàng", c.fmt_n(values["customers"])),
+        kpi("Khách rời bỏ", c.fmt_n(values["churners"])),
+        kpi("Tỷ lệ rời bỏ", c.fmt_pct(values["rate"]),
+            values["rate"] - COMPANY["rate"] if len(data) != len(DATA) else None),
+        kpi("Doanh thu tháng của nhóm rời bỏ", c.fmt_money(values["lost_revenue"]),
+            note=f"{c.fmt_pct(values['lost_revenue'] / revenue)} doanh thu" if revenue else "—"),
+        kpi("Thời gian sử dụng trung bình", f"{c.fmt_ratio(values['tenure_mean'])} tháng"),
+    ], className="kpi-grid five")
+    return [cards, html.Div([
+        graph("C05_vong_doi", data, wide=True),
+        graph("C01_ty_le_churn", data),
+        graph("C14_treemap_vung", data),
+        graph("C13_vung", data, wide=True),
+    ], className="grid")]
+
+
+def page_drivers(data):
+    cards = html.Div([
+        rate_kpi("Tỷ lệ rời bỏ · thiết bị trên 2 năm", data[data.EquipmentAgeBand == ">730 ngày"]),
+        rate_kpi("Tỷ lệ rời bỏ · thiết bị không hỗ trợ mạng", data[data.HandsetWebCapable == "No"]),
+        rate_kpi("Tỷ lệ rời bỏ · tháng sử dụng 11–12", data[data.MonthsInService.between(11, 12)]),
+        rate_kpi("Tỷ lệ rời bỏ · không gọi chăm sóc khách hàng", data[data.CustomerCareCalls == 0]),
+    ], className="kpi-grid")
+    keys = ["C06_tuoi_thiet_bi", "C07_heatmap_tenure_thiet_bi", "C09_dac_diem_thiet_bi",
+            "C10_goi_cskh", "C11_cuoc_goi_rot", "C12_goi_cuoc"]
+    return [cards, html.Div([graph(key, data) for key in keys], className="grid")]
+
+
+def page_risk(data):
+    cards = [
+        rate_kpi("Tỷ lệ rời bỏ · đã liên hệ giữ chân", data[data.MadeCallToRetentionTeam == "Yes"]),
+        rate_kpi("Tỷ lệ rời bỏ · tín dụng hạng 1–3", data[data.CreditRating.isin(c.CREDIT_ORDER[:3])]),
+    ]
+    if HAS_RISK:
+        high = data[data.RiskDecile >= 8]
+        cards.extend([
+            kpi("Khách rủi ro nhóm 8–10", c.fmt_n(len(high)),
+                note=f"{c.fmt_pct(len(high) / len(data))} khách đang chọn"),
+            rate_kpi("Tỷ lệ rời bỏ · nhóm rủi ro 8–10", high),
+        ])
+    panels = [graph("C08_retention_funnel", data, wide=True)]
+    if HAS_RISK:
+        panels.extend([graph("C19a_risk_decile", data), graph("C19b_gain_curve", data)])
+    panels.extend([graph("C16_tin_dung", data, wide=True), graph("C17_nhan_khau_hoc", data, wide=True)])
+    return [html.Div(cards, className="kpi-grid"), html.Div(panels, className="grid")]
+
+
+def segment_table(summary):
+    headings = ["Phân khúc", "Số khách", "Khách rời bỏ", "Tỷ lệ rời bỏ",
+                "Doanh thu trung bình / tháng", "Doanh thu ước tính có rủi ro / tháng"]
+    rows = []
+    for row in summary.itertuples():
+        rows.append(html.Tr([
+            html.Th(str(row.ActionSegment), scope="row"),
+            *[html.Td(value, className="numeric") for value in (
+                c.fmt_n(row.n), c.fmt_n(row.churners), c.fmt_pct(row.rate),
+                c.fmt_money(row.avg_revenue), c.fmt_money(row.revenue_at_risk),
+            )],
+        ]))
+    return html.Section([
+        html.H2("Số liệu theo phân khúc", className="chart-title"),
+        html.Div(html.Table([
+            html.Thead(html.Tr([html.Th(label, scope="col") for label in headings])),
+            html.Tbody(rows),
+        ], className="data-table"), className="table-scroll", tabIndex=0,
+            role="region", **{"aria-label": "Số liệu theo phân khúc"}),
+    ], className="panel wide")
+
+
+def page_action(data):
+    summary = c.segment_summary(data)
+    selected = summary[summary.ActionSegment != "Ổn định"]
+    count = selected.n.sum()
+    rate = selected.churners.sum() / count if count else None
+    cards = html.Div([
+        kpi("Khách thuộc phân khúc ưu tiên", c.fmt_n(count),
+            note=f"{c.fmt_pct(count / len(data))} khách đang chọn"),
+        kpi("Doanh thu ước tính có rủi ro / tháng", c.fmt_money(selected.revenue_at_risk.sum())),
+        kpi("Tỷ lệ rời bỏ · phân khúc ưu tiên", c.fmt_pct(rate) if rate is not None else "—",
+            rate - COMPANY["rate"] if rate is not None else None),
     ], className="kpi-grid three")
-    fig = c.segment_bubble(df)
-    return [cards, insight_box([fig]),
-            html.Div([graph(fig, wide=True)], className="grid"),
-            html.H2("Chính sách đề xuất theo phân khúc", className="section-title"),
-            html.Div([policy_card(r) for r in seg.itertuples()], className="policy-grid"),
-            html.P("Phân khúc xét theo thứ tự ưu tiên: Đã báo động → Hết hợp đồng (tháng 10–13) → Máy cũ → Rủi ro cao. "
-                   "Đề xuất cần A/B test (nhóm thử/đối chứng) trước khi triển khai rộng.", className="note")]
+    return [cards, html.Div([graph("C20_phan_khuc", data, wide=True), segment_table(summary)], className="grid")]
 
 
 RENDERERS = {"/": page_overview, "/nguyen-nhan": page_drivers, "/rui-ro": page_risk, "/hanh-dong": page_action}
-
-
-# ---------- app ----------
-
-app = Dash(__name__, title="Cell2Cell · Churn BI", assets_folder="assets_bi", suppress_callback_exceptions=True)
+app = Dash(__name__, title="Cell2Cell · Phân tích khách hàng", assets_folder="assets_bi", suppress_callback_exceptions=True)
 server = app.server
-
 app.layout = html.Div([
     dcc.Location(id="url"),
     html.Aside([
         html.Div([html.Div("C2C", className="brand-mark"),
-                  html.Div([html.Strong("Cell2Cell"), html.Span("Churn & Retention BI")])], className="brand"),
-        html.Nav(id="nav", className="nav"),
-        html.Div(f"Nguồn: cell2celltrain.csv · {c.fmt_n(len(DATA))} khách · snapshot", className="side-note"),
+                  html.Div([html.Strong("Cell2Cell"), html.Span("Phân tích khách hàng")])], className="brand"),
+        html.Nav(id="nav", className="nav", **{"aria-label": "Điều hướng"}),
+        html.Div(f"{c.fmt_n(len(DATA))} khách hàng", className="side-note"),
     ], className="sidebar"),
     html.Main([
         html.Div([
-            *[html.Div([html.Label(label, htmlFor=f"f-{key}"),
-                        dcc.Dropdown(id=f"f-{key}", options=options(col), multi=True, placeholder="Tất cả")],
-                       className="filter") for key, label, col in FILTERS],
+            *[html.Label([
+                html.Span(label, className="filter-label"),
+                dcc.Dropdown(id=f"f-{key}", options=options(column), multi=True, placeholder="Tất cả"),
+            ], className="filter") for key, label, column in FILTERS],
             html.Button("Xóa lọc", id="reset", className="reset", n_clicks=0),
         ], className="filters"),
         dcc.Loading(html.Div(id="page"), type="dot", color=c.ACCENT),
-        html.Footer("Quan hệ trong dashboard là tương quan quan sát trên một snapshot, không phải nhân quả. "
-                    "Doanh thu = MonthlyRevenue hiện tại, không phải lợi nhuận/CLV.", className="footer"),
+        html.Footer(f"Cập nhật: {UPDATED_AT}", className="footer"),
     ], className="main"),
 ], className="shell")
 
@@ -223,22 +241,22 @@ app.layout = html.Div([
 @app.callback(Output("nav", "children"), Input("url", "pathname"))
 def render_nav(path):
     path = path if path in RENDERERS else "/"
-    return [dcc.Link([html.Span(f"0{i}", className="nav-num"), name], href=href,
+    return [dcc.Link([html.Span(f"0{index}", className="nav-num"),
+                      html.Span(name, **{"aria-current": "page" if href == path else "false"})], href=href,
                      className="nav-item active" if href == path else "nav-item")
-            for i, (href, name, _) in enumerate(PAGES, start=1)]
+            for index, (href, name) in enumerate(PAGES, start=1)]
 
 
-@app.callback(Output("page", "children"), Input("url", "pathname"), *[Input(f"f-{k}", "value") for k, _, _ in FILTERS])
+@app.callback(Output("page", "children"), Input("url", "pathname"), *[Input(f"f-{key}", "value") for key, _, _ in FILTERS])
 def render_page(path, *values):
     path = path if path in RENDERERS else "/"
-    df = apply_filters(values)
-    if df.empty:
-        return [header(path, df), html.Div([html.H2("Không có khách hàng cho bộ lọc này"),
-                                            html.P("Hãy bỏ bớt điều kiện lọc.")], className="empty")]
-    return [header(path, df), *RENDERERS[path](df)]
+    data = apply_filters(values)
+    if data.empty:
+        return [header(path, data), html.Div("Không có dữ liệu", className="empty")]
+    return [header(path, data), *RENDERERS[path](data)]
 
 
-@app.callback(*[Output(f"f-{k}", "value") for k, _, _ in FILTERS], Input("reset", "n_clicks"), prevent_initial_call=True)
+@app.callback(*[Output(f"f-{key}", "value") for key, _, _ in FILTERS], Input("reset", "n_clicks"), prevent_initial_call=True)
 def reset_filters(_):
     return [None] * len(FILTERS)
 

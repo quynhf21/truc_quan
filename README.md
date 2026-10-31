@@ -32,6 +32,8 @@ Không chạy `run_all.py` thì dashboard vẫn chạy, chỉ ẩn phần điể
 Xuất PNG (`fig.write_image`) dùng `kaleido` 1.x, cần Chrome/Edge trên máy; nếu thiếu thì chạy `kaleido_get_chrome` một lần.
 Kiểm tra nhanh mọi hàm vẽ: `python work/viz/smoke_test.py`.
 
+Dashboard đọc bộ kết quả trong `work/build/dashboard/` do ô cuối notebook 04 xuất ra: bản dữ liệu phân tích và biểu đồ Plotly. Cần chạy toàn bộ notebook trước khi mở dashboard; chạy lại notebook rồi khởi động lại dashboard khi cập nhật kết quả. Dashboard chỉ hiển thị chỉ số, biểu đồ và bảng phân khúc; nhận xét và chính sách giữ chân nằm trong notebook và tài liệu.
+
 ## Cấu trúc
 
 ```
@@ -39,7 +41,8 @@ data/cell2celltrain.csv            nguồn raw (không sửa)
 work/viz/prepare_viz_data.py       làm sạch, band, Region, ActionSegment, ghép điểm rủi ro
 work/viz/charts.py                 bảng màu + 20 hàm vẽ Plotly dùng chung cho notebook và dashboard
 work/viz/04_eda_truc_quan.ipynb    EDA trực quan, insight, phân khúc, chính sách
-work/dashboard/dashboard.py        dashboard BI 4 trang: Tổng quan · Nguyên nhân · Chân dung & rủi ro · Hành động
+work/dashboard/dashboard.py        dashboard: Tổng quan · Thiết bị và dịch vụ · Hồ sơ và rủi ro · Phân khúc
+work/build/dashboard/              bộ kết quả notebook: dữ liệu và biểu đồ Plotly (tạo khi chạy, không đưa vào Git)
 work/dashboard/assets_bi/          CSS của dashboard mới
 work/pipeline/01–03                pipeline bản trước (QA, EDA, CatBoost OOF); dùng lại điểm rủi ro
 work/dashboard/dashboard_v1.py     dashboard bản trước (giữ để đối chiếu)

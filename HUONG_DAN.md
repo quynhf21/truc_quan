@@ -22,11 +22,12 @@ python -m pip install -r work/requirements.txt
 |---|---|---|---|
 | 1 (tùy chọn) | `python work/pipeline/run_all.py` | Điểm rủi ro CatBoost 52 cột `work/build/customer_mart.parquet` | 8–15 phút |
 | 2 | `python work/viz/prepare_viz_data.py` | `work/build/viz_customers.parquet` (51.047 dòng) | vài giây |
-| 3 | `jupyter nbconvert --to notebook --execute --inplace work/viz/04_eda_truc_quan.ipynb` | Notebook có output + PNG trong `reports/figures/` | ~1 phút |
+| 3 | Mở notebook 04 và chạy tất cả các ô; hoặc `jupyter nbconvert --to notebook --execute --inplace work/viz/04_eda_truc_quan.ipynb` | Output, PNG và bộ kết quả dashboard trong `work/build/dashboard/` | vài phút |
 | 4 | `python work/dashboard/dashboard.py` | Dashboard tại http://127.0.0.1:8050/ | — |
 
 - Bỏ qua bước 1 thì dashboard vẫn chạy, chỉ ẩn phần điểm rủi ro, gain curve và nhóm "Rủi ro cao (mô hình)".
 - Chạy bước 1 sau bước 2 thì phải chạy lại bước 2 để ghép điểm rủi ro.
+- Bước 3 là bắt buộc trước khi mở dashboard. Notebook xuất biểu đồ Plotly và bản dữ liệu cùng lần chạy. Khi cập nhật dữ liệu hoặc biểu đồ, chạy lại bước 2–3 rồi khởi động lại dashboard.
 - `work/build/` bị gitignore: máy mới clone về phải chạy lại từ bước 1 hoặc bước 2.
 - Bước 1 ghi lại output vào notebook 01–03. Nếu không muốn commit thay đổi đó: `git checkout -- work/pipeline/`.
 
@@ -44,11 +45,11 @@ So sánh mô hình (CatBoost 10/52 cột, Logistic, LightGBM): `python work/expe
 
 ## 3. Dùng dashboard
 
-- **Thanh bên trái:** 4 trang theo mạch Tổng quan → Nguyên nhân → Chân dung & rủi ro → Hành động.
+- **Thanh bên trái:** Tổng quan → Thiết bị và dịch vụ → Hồ sơ và rủi ro → Phân khúc khách hàng.
 - **Bộ lọc trên cùng:** Thời gian sử dụng, Vùng, Tuổi thiết bị, Hạng tín dụng. Được chọn nhiều giá trị; để trống nghĩa là "Tất cả".
-  Mọi KPI, tiêu đề biểu đồ và hộp Insight tính lại theo lát cắt. **Xóa lọc** đưa về toàn bộ khách.
+  Chỉ số và biểu đồ cập nhật theo lát cắt từ bản dữ liệu do notebook xuất. **Xóa lọc** đưa về toàn bộ khách và biểu đồ đã lưu.
 - **KPI:** ▲ đỏ = xấu hơn toàn công ty, ▼ xanh = tốt hơn.
-- **Biểu đồ:** rê chuột để xem n, số churn, churn rate. Nút máy ảnh góc phải để tải PNG.
+- **Biểu đồ:** rê chuột để xem số khách, số khách rời bỏ và tỷ lệ rời bỏ. Nút máy ảnh góc phải để tải PNG. Dashboard hiển thị tiêu đề trung tính; nhận xét và chính sách nằm trong notebook.
 - Thử nhanh: lọc "13–18 tháng" thì phải ra 11.917 khách, churn 31,6%.
 
 ## 4. Cấu trúc và nơi cần sửa
@@ -58,11 +59,11 @@ So sánh mô hình (CatBoost 10/52 cột, Logistic, LightGBM): `python work/expe
 | Đổi ngưỡng band, rule phân khúc | `work/viz/prepare_viz_data.py` (`BANDS`, `add_segment`) → chạy lại bước 2–4 |
 | Sửa/thêm biểu đồ | `work/viz/charts.py`: viết hàm nhận `df` trả `go.Figure`, thêm vào `FIGURES` |
 | Đổi màu, font, định dạng số | Đầu file `charts.py` (`CHURN`, `STAY`, `ACCENT`, `apply_style`, `fmt_*`) |
-| Bố cục trang, KPI, nội dung chính sách | `work/dashboard/dashboard.py` (`page_*`, `POLICIES`) |
+| Bố cục trang, chỉ số, bảng phân khúc, tên biểu đồ | `work/dashboard/dashboard.py` (`page_*`, `CHART_TITLES`) |
 | Giao diện dashboard | `work/dashboard/assets_bi/bi.css` |
 | Nội dung phân tích, insight | `work/viz/04_eda_truc_quan.ipynb` |
 
-Notebook và dashboard dùng **chung** `charts.py`, nên sửa một chỗ thì cả hai đổi theo.
+Notebook dùng `charts.py` để vẽ và xuất kết quả. Dashboard đọc các biểu đồ đã xuất ở chế độ toàn bộ khách; khi lọc, nó dùng cùng hàm vẽ trên bản dữ liệu đã xuất. Vì vậy sửa biểu đồ xong cần chạy lại notebook và khởi động lại dashboard.
 
 Thêm một biểu đồ mới:
 
@@ -70,7 +71,7 @@ Thêm một biểu đồ mới:
    và gọi `add_baseline(...)` nếu vẽ churn rate.
 2. Thêm vào `FIGURES` với khóa `Cxx_ten_khong_dau`.
 3. Chạy `python work/viz/smoke_test.py`.
-4. Thêm ô `show("Cxx_...")` và ô **Insight** vào notebook; nếu cần hiện trên dashboard thì gọi trong `page_*`.
+4. Thêm ô `show("Cxx_...")` và ô **Nhận xét** vào notebook; nếu cần hiện trên dashboard thì thêm tiêu đề vào `CHART_TITLES` và gọi `graph(...)` trong `page_*`. Chạy lại toàn bộ notebook để xuất kết quả.
 
 Các file **không** sửa: `data/cell2celltrain.csv`, notebook `work/pipeline/01–03`, `pages_src/`, `export_pages.py`
 (bản cũ, xem [`AGENTS.md`](AGENTS.md)).
@@ -79,8 +80,8 @@ Các file **không** sửa: `data/cell2celltrain.csv`, notebook `work/pipeline/0
 
 | Lỗi | Cách xử lý |
 |---|---|
-| `Chưa có dữ liệu dashboard` | Chạy bước 2 |
-| Dashboard không có điểm rủi ro | Chạy bước 1 rồi bước 2 |
+| `Chưa có kết quả dashboard` | Chạy bước 2 rồi chạy toàn bộ notebook ở bước 3 |
+| Dashboard không có điểm rủi ro | Chạy bước 1–3 rồi khởi động lại dashboard |
 | `ModuleNotFoundError` | Chưa kích hoạt `.venv` hoặc chưa `pip install -r work/requirements.txt` |
 | Lỗi Chrome/Kaleido khi `write_image` | Chạy `kaleido_get_chrome`, hoặc tạm bỏ dòng `fig.write_image` trong hàm `show` của notebook |
 | Cổng 8050 đang bận | Tắt dashboard cũ (Ctrl+C), hoặc đổi `port=` cuối file `dashboard.py` |
