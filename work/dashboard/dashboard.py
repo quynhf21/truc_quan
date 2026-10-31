@@ -1,8 +1,9 @@
-"""Cell2Cell BI demo. Run `python work/pipeline.py` before this file."""
+"""Cell2Cell BI demo. Run `python work/pipeline/run_all.py` before this file."""
 
 from __future__ import annotations
 
 import json
+import textwrap
 from pathlib import Path
 
 import numpy as np
@@ -14,10 +15,11 @@ from sklearn.metrics import roc_auc_score, average_precision_score
 
 
 ROOT = Path(__file__).resolve().parent
-BUILD = ROOT / "build"
+WORK = ROOT.parent
+BUILD = WORK / "build"
 MART = BUILD / "customer_mart.parquet"
 if not MART.exists():
-    raise SystemExit("Chưa có dữ liệu dashboard. Hãy chạy: python work/pipeline.py")
+    raise SystemExit("Chưa có dữ liệu dashboard. Hãy chạy: python work/pipeline/run_all.py")
 DATA = pd.read_parquet(MART)
 QA = json.loads((BUILD / "qa_report.json").read_text(encoding="utf-8"))
 MODEL = json.loads((BUILD / "model_metrics.json").read_text(encoding="utf-8"))
@@ -52,14 +54,15 @@ def wilson(churn, n):
 
 def styled(fig, height=340, percent=False):
     fig.update_layout(
-        template=PLOT_TEMPLATE, height=height, margin=dict(l=30, r=25, t=55, b=40),
+        template=PLOT_TEMPLATE, height=height, margin=dict(l=45, r=45, t=30, b=65),
         font=dict(family="Inter, Segoe UI, sans-serif", color=INK),
         paper_bgcolor="white", plot_bgcolor="white", title_font_size=15,
         colorway=[BLUE, TEAL, RED, "#99B6CC"],
         hoverlabel=dict(bgcolor="white", font_color=INK),
+        legend=dict(orientation="h", y=1.15, x=0),
     )
-    fig.update_xaxes(gridcolor=GRID, zeroline=False)
-    fig.update_yaxes(gridcolor=GRID, zeroline=False)
+    fig.update_xaxes(gridcolor=GRID, zeroline=False, automargin=True)
+    fig.update_yaxes(gridcolor=GRID, zeroline=False, automargin=True)
     if percent:
         fig.update_yaxes(tickformat=".0%", range=[0, None])
     return fig
@@ -71,8 +74,14 @@ def card(label, value, note=""):
 
 
 def panel(title, item, note="", span=False):
-    child = dcc.Graph(figure=item, config={"displaylogo": False, "modeBarButtonsToRemove": ["lasso2d", "select2d"]}) if isinstance(item, go.Figure) else item
-    return html.Div([html.Div(title, className="panel-title"), child,
+    caption = None
+    if isinstance(item, go.Figure):
+        caption = html.Div(item.layout.title.text, className="chart-caption")
+        item.update_layout(title=None, autosize=True)
+        child = dcc.Graph(figure=item, responsive=True, style={"height": "380px", "width": "100%"}, config={"responsive": True, "displaylogo": False, "modeBarButtonsToRemove": ["lasso2d", "select2d"]})
+    else:
+        child = item
+    return html.Div([html.Div(title, className="panel-title"), caption, child,
                      html.Div(note, className="panel-note") if note else None],
                     className="panel" + (" wide" if span else ""))
 
@@ -99,7 +108,8 @@ def group_comparison(frame, column, left, right, prefix):
 def group_metrics(frame, column, order=None):
     summary = (frame.groupby(column, dropna=False, observed=True)["Churn"]
                .agg(n="size", churners="sum").reset_index())
-    summary[column] = summary[column].astype(str).replace("<NA>", "Không rõ")
+    if not pd.api.types.is_numeric_dtype(summary[column]):
+        summary[column] = summary[column].astype(str).replace("<NA>", "Không rõ")
     summary["rate"] = summary["churners"] / summary["n"]
     summary["low"], summary["high"] = wilson(summary["churners"], summary["n"])
     if order:
@@ -110,23 +120,38 @@ def group_metrics(frame, column, order=None):
 
 def rate_chart(frame, column, title, order=None):
     s = group_metrics(frame, column, order)
+    horizontal = max(s[column].astype(str).str.len(), default=0) > 14
     fig = go.Figure(go.Bar(
-        x=s[column], y=s["rate"], marker_color=BLUE,
-        error_y=dict(type="data", symmetric=False, array=s["high"]-s["rate"],
+        x=s["rate"] if horizontal else s[column],
+        y=s[column] if horizontal else s["rate"],
+        orientation="h" if horizontal else "v", marker_color=BLUE,
+        **{("error_x" if horizontal else "error_y"): dict(type="data", symmetric=False, array=s["high"]-s["rate"],
                      arrayminus=s["rate"]-s["low"], color=MUTED, thickness=1),
+        },
         customdata=np.stack([s["n"], s["churners"]], axis=-1),
-        hovertemplate="%{x}<br>Churn: %{y:.1%}<br>Khách: %{customdata[0]:,}<br>Churner: %{customdata[1]:,}<extra></extra>",
+        hovertemplate=("%{y}<br>Churn: %{x:.1%}" if horizontal else "%{x}<br>Churn: %{y:.1%}") + "<br>Khách: %{customdata[0]:,}<br>Churner: %{customdata[1]:,}<extra></extra>",
     ))
     fig.update_layout(title=title, xaxis_title=None, yaxis_title="Tỷ lệ churn")
-    return styled(fig, percent=True)
+    fig = styled(fig, percent=not horizontal)
+    if horizontal:
+        fig.update_layout(xaxis_title="Tỷ lệ churn", yaxis_title=None)
+        fig.update_xaxes(tickformat=".0%", rangemode="tozero")
+        fig.update_yaxes(autorange="reversed", automargin=True)
+        fig.update_yaxes(tickvals=s[column], ticktext=["<br>".join(textwrap.wrap(str(v), 18)) for v in s[column]])
+    return fig
 
 
 def volume_chart(frame, column, title, order=None):
     s = group_metrics(frame, column, order)
-    fig = px.bar(s, x=column, y="n", text="n", title=title)
+    horizontal = max(s[column].astype(str).str.len(), default=0) > 14
+    fig = px.bar(s, x="n" if horizontal else column, y=column if horizontal else "n", text="n", title=title,
+                 orientation="h" if horizontal else "v")
     fig.update_traces(marker_color=TEAL, textposition="outside", cliponaxis=False,
-                      hovertemplate="%{x}<br>Khách: %{y:,}<extra></extra>")
-    fig.update_layout(xaxis_title=None, yaxis_title="Số khách hàng")
+                      hovertemplate=("%{y}<br>Khách: %{x:,}<extra></extra>" if horizontal else "%{x}<br>Khách: %{y:,}<extra></extra>"))
+    fig.update_layout(xaxis_title="Số khách hàng" if horizontal else None, yaxis_title=None if horizontal else "Số khách hàng")
+    if horizontal:
+        fig.update_yaxes(autorange="reversed", tickvals=s[column], ticktext=["<br>".join(textwrap.wrap(str(v), 18)) for v in s[column]])
+        fig.update_xaxes(range=[0, float(s.n.max()) * 1.2])
     return styled(fig)
 
 
@@ -146,7 +171,7 @@ def overview(frame):
         card("Khách hàng trong lát cắt", fmt_n(len(frame)), "Mẫu số của mọi KPI dưới đây"),
         card("Khách hàng churn", fmt_n(churn), "Churn = Yes trong cùng lát cắt"),
         card("Tỷ lệ churn", fmt_pct(rate, 2), "Baseline toàn nguồn: " + fmt_pct(QA["baseline_churn_rate"], 2)),
-        card("Khách ở top 20% risk", fmt_n(len(high)), "Decile 9–10, điểm ngoài mẫu"),
+        card("Khách thuộc decile 9–10", fmt_n(len(high)), "Top 20% toàn nguồn, trong lát cắt hiện tại"),
     ], className="kpi-grid")
     tenure_order = ["6–11 tháng", "12–18 tháng", "19–24 tháng", "25+ tháng"]
     reason = group_metrics(frame, "ReasonCode").sort_values("churners", ascending=False)
@@ -154,6 +179,8 @@ def overview(frame):
                         title="Số churner theo tín hiệu rà soát")
     fig_reason.update_traces(marker_color=RED, textposition="outside", cliponaxis=False)
     fig_reason.update_layout(xaxis_title="Số churner", yaxis_title=None, yaxis=dict(autorange="reversed"))
+    fig_reason.update_xaxes(range=[0, max(1, float(reason.churners.max())) * 1.2])
+    fig_reason.update_yaxes(tickvals=reason.ReasonCode, ticktext=["<br>".join(textwrap.wrap(v, 18)) for v in reason.ReasonCode])
     return [html.Div([html.Span("01 / EXECUTIVE VIEW", className="eyebrow"), html.H1("Churn đang tập trung ở đâu?"),
                       html.P("Bắt đầu từ quy mô vấn đề, sau đó đi sâu vào tín hiệu và nhóm cần ưu tiên.")], className="page-intro"),
             kpis,
@@ -295,7 +322,12 @@ def strategy(frame):
                       html.P("CreditRating chỉ nằm trong mô hình đã khóa và đánh giá fairness; không dùng đơn lẻ để từ chối hỗ trợ hoặc đưa ra điều kiện bất lợi.")], className="callout")]
 
 
-app = Dash(__name__, title="Cell2Cell | Retention Intelligence", suppress_callback_exceptions=True)
+app = Dash(
+    __name__,
+    title="Cell2Cell | Retention Intelligence",
+    suppress_callback_exceptions=True,
+    assets_folder=str(ROOT / "assets"),
+)
 app.layout = html.Div([
     dcc.Location(id="url"),
     html.Aside([

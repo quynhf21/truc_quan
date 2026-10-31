@@ -1,0 +1,2 @@
+# Optional dependencies for Edge headless UI audits (not required to run Dash).
+playwright>=1.50,<2

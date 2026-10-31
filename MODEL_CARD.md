@@ -8,7 +8,7 @@ CatBoost xếp hạng rủi ro churn cho dashboard và so sánh campaign capacit
 
 - Nguồn: `data/cell2celltrain.csv`, 51.047 khách có `CustomerID` và `Churn` hợp lệ.
 - Target: `Churn = Yes` → 1; `No` → 0. Baseline 14.711/51.047 = 28,82%.
-- Predictor: đúng 10 base feature trong `M0_project_contract.md`; không dùng ID, retention contact/offer hoặc derived bands.
+- Predictor: đúng 10 base feature trong `project_contract.md`; không dùng ID, retention contact/offer hoặc derived bands.
 - Missing numeric được CatBoost xử lý; categorical missing được gắn `Unknown`.
 - Score để đánh giá: 3-fold out-of-fold. Trong mỗi outer training fold, một inner split chọn depth 4/6 và vòng dừng sớm bằng validation log loss. Model fit lại outer training fold rồi dự đoán outer holdout. Seed outer split 2026; seed inner split 43–45.
 - Không có feature thời gian thực hoặc timestamp xác minh feature tồn tại trước churn. Cần audit timing trước vận hành.

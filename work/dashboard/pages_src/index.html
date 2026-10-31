@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Cell2Cell Churn & Retention Intelligence — dashboard phân tích và ưu tiên khách hàng rời bỏ.">
+  <title>Cell2Cell | Retention Intelligence</title>
+  <link rel="stylesheet" href="./style.css">
+  <script defer src="./plotly.min.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><div class="mark">C2C</div><div><strong>Cell2Cell</strong><small>RETENTION INTELLIGENCE</small></div></div>
+      <div class="nav-label">WORKSPACE</div>
+      <nav aria-label="Trang dashboard">
+        <button data-page="overview" class="nav active">◫ &nbsp; Overview</button>
+        <button data-page="drivers" class="nav">▥ &nbsp; Drivers</button>
+        <button data-page="risk" class="nav">◉ &nbsp; Risk & Segments</button>
+        <button data-page="strategy" class="nav">◇ &nbsp; Retention Strategy</button>
+      </nav>
+      <div class="side-bottom"><div class="nav-label">DATA SNAPSHOT</div><p>51.047 khách hàng · 58 cột</p><p>Churn là outcome của một snapshot quan sát.</p></div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div class="topline"><span>CELL2CELL / BUSINESS INTELLIGENCE</span><button id="reset">Đặt lại bộ lọc ↺</button></div>
+        <div class="filters">
+          <label>TENURE<select id="tenure"></select></label>
+          <label>WEB CAPABILITY<select id="web"></select></label>
+          <label>VALUE TIER<select id="value"></select></label>
+          <label>RISK DECILE<select id="decile"></select></label>
+        </div>
+      </header>
+      <div id="content" class="content" aria-live="polite"><div class="loading">Đang tải dữ liệu dashboard…</div></div>
+      <footer>Nguồn: cell2celltrain.csv · Mẫu số theo bộ lọc · Score ngoài mẫu · Chính sách là giả thuyết</footer>
+    </main>
+  </div>
+</body>
+</html>

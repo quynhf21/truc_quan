@@ -8,7 +8,7 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score
 
 ROOT = Path(__file__).resolve().parent
-BUILD = ROOT / "build"
+BUILD = ROOT.parent / "build"
 
 
 def main():
