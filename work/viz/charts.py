@@ -97,10 +97,10 @@ def segment_summary(df: pd.DataFrame) -> pd.DataFrame:
 def apply_style(fig: go.Figure, title: str, subtitle: str = "", height=380) -> go.Figure:
     text = f"<b>{title}</b>" + (f"<br><span style='font-size:12px;color:{MUTED}'>{subtitle}</span>" if subtitle else "")
     fig.update_layout(
-        title=dict(text=text, x=0, xanchor="left", y=0.97, yanchor="top", font=dict(size=15, color=INK)),
+        title=dict(text=text, x=0.01, xanchor="left", y=0.98, yanchor="top", pad=dict(t=8), font=dict(size=15, color=INK)),
         template="plotly_white", height=height, separators=",.",
         font=dict(family=FONT, size=12, color=INK),
-        margin=dict(l=10, r=20, t=80, b=40),
+        margin=dict(l=10, r=20, t=92, b=40),
         paper_bgcolor="white", plot_bgcolor="white",
         legend=dict(orientation="h", yanchor="bottom", y=1.0, x=1, xanchor="right", title=None),
         hoverlabel=dict(bgcolor="white", font=dict(family=FONT, color=INK)),
