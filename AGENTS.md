@@ -13,7 +13,7 @@ dashboard chuẩn BI → chính sách giữ chân. Mô hình ML chỉ là phần
 - Không chắc yêu cầu → hỏi lại, không đoán.
 
 ## Cấm
-- Sửa `data/cell2celltrain.csv`, notebook `work/pipeline/01–03`, `pages_src/`, `export_pages.py`.
+- Sửa `data/cell2celltrain.csv`, notebook `work/pipeline/01–03`, `pages_src/`, `export_pages.py`, `.github/workflows/` (token push không có quyền workflow).
 - Train lại mô hình, thêm manifest/hash/verify/audit script mới.
 - Hard-code số liệu (churn rate, n...) trong code hoặc tiêu đề biểu đồ; mọi số phải tính từ dữ liệu.
 - Commit `.venv/`, `work/build/`, file dữ liệu sinh ra.

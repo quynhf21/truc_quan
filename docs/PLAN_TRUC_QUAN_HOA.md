@@ -176,7 +176,7 @@ Bộ lọc dùng chung đặt ở thanh trên cùng (mục 2.9). Sidebar điều
 ### T0 — Chuẩn bị (5 phút)
 - Thêm vào `work/requirements.txt`: `kaleido>=0.2,<2` (xuất PNG từ Plotly) và `nbconvert>=7,<8` (chạy notebook).
 - Tạo `.venv`, `pip install -r work/requirements.txt`.
-- Sửa `.github/workflows/pages.yml`: bỏ trigger `push`, chỉ giữ `workflow_dispatch`.
+- ~~Sửa `.github/workflows/pages.yml`~~: bỏ, vì token push không có quyền `workflow`; workflow cũ vẫn chạy được với `dashboard_v1.py`.
 - **DoD:** `python -c "import pandas, plotly, dash, kaleido, nbconvert"` chạy được.
 
 ### T1 — Chuẩn bị dữ liệu trực quan (15 phút)

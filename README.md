@@ -60,7 +60,7 @@ docs/PLAN_TRUC_QUAN_HOA.md         plan làm lại theo hướng trực quan hó
 
 ## Phụ lục: pipeline mô hình và dashboard bản trước
 
-> Phần dưới mô tả bản trước. Dashboard cũ nay là `work/dashboard/dashboard_v1.py`: ở mọi lệnh bên dưới, thay `work/dashboard/dashboard.py` bằng file này. Workflow Pages chỉ còn chạy thủ công (`workflow_dispatch`).
+> Phần dưới mô tả bản trước. Dashboard cũ nay là `work/dashboard/dashboard_v1.py`: ở mọi lệnh bên dưới, thay `work/dashboard/dashboard.py` bằng file này. Workflow Pages (`.github/workflows/pages.yml`) vẫn chạy pipeline cũ khi push; không ảnh hưởng dashboard mới.
 
 Web dashboard BI phục vụ demo đề tài: phân tích khách hàng viễn thông có khả năng rời bỏ, xếp hạng nhóm cần ưu tiên và đề xuất chính sách giữ chân để thử nghiệm. Trọng tâm là **trực quan hóa trả lời câu hỏi kinh doanh**. Nguồn là một snapshot quan sát; không có lịch sử can thiệp hoặc kết quả A/B test.
 
