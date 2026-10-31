@@ -20,7 +20,7 @@ python -m pip install -r work/requirements.txt
 
 | Bước | Lệnh | Kết quả | Thời gian |
 |---|---|---|---|
-| 1 (tùy chọn) | `python work/pipeline/run_all.py` | Điểm rủi ro CatBoost `work/build/customer_mart.parquet` | 3–5 phút |
+| 1 (tùy chọn) | `python work/pipeline/run_all.py` | Điểm rủi ro CatBoost 52 cột `work/build/customer_mart.parquet` | 8–15 phút |
 | 2 | `python work/viz/prepare_viz_data.py` | `work/build/viz_customers.parquet` (51.047 dòng) | vài giây |
 | 3 | `jupyter nbconvert --to notebook --execute --inplace work/viz/04_eda_truc_quan.ipynb` | Notebook có output + PNG trong `reports/figures/` | ~1 phút |
 | 4 | `python work/dashboard/dashboard.py` | Dashboard tại http://127.0.0.1:8050/ | — |
@@ -35,8 +35,12 @@ Kết quả đúng khi bước 2 in ra `51.047 dòng` và `Churn: 14.711 khách 
 Kiểm tra nhanh sau khi sửa code:
 
 ```powershell
-python work/viz/smoke_test.py    # gọi 21 hàm vẽ trên dữ liệu thật + các lát cắt nhỏ, phải in toàn "OK"
+python work/viz/smoke_test.py             # gọi 21 hàm vẽ trên dữ liệu thật + các lát cắt nhỏ, phải in toàn "OK"
+python work/pipeline/verify_notebooks.py  # sau bước 1: 3 AUDIT PASS + 14 GUARD PASS
 ```
+
+So sánh mô hình (CatBoost 10/52 cột, Logistic, LightGBM): `python work/experiments/compare_models.py` (4–6 phút,
+`--quick` khoảng 2 phút), kết quả ở `work/build/model_comparison.csv`. Lý do chọn mô hình: [`MODEL_CARD.md`](MODEL_CARD.md).
 
 ## 3. Dùng dashboard
 
@@ -85,6 +89,12 @@ Các file **không** sửa: `data/cell2celltrain.csv`, notebook `work/pipeline/0
 ## 6. Giao việc tiếp cho Codex
 
 Codex tự đọc `AGENTS.md`. Mỗi lần chỉ giao một việc nhỏ, có tiêu chí kiểm tra, ví dụ:
+
+```
+Đọc AGENTS.md và docs/TASK_T10_CHAY_LAI_LOCAL.md. Làm T10, trả lời đúng mẫu ở mục 5.
+```
+
+Ví dụ việc nhỏ khác:
 
 ```
 Đọc AGENTS.md và HUONG_DAN.md. Thêm biểu đồ churn theo HandsetPrice vào charts.py theo mục 4,

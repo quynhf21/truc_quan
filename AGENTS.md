@@ -2,6 +2,8 @@
 
 Đọc **`docs/PLAN_TRUC_QUAN_HOA.md` trước khi làm bất cứ việc gì**. Đó là plan đã duyệt.
 
+Task đang mở: **T10** — [`docs/TASK_T10_CHAY_LAI_LOCAL.md`](docs/TASK_T10_CHAY_LAI_LOCAL.md) (chạy lại trên Windows, đối chiếu số, chỉ báo cáo).
+
 ## Mục tiêu
 Đồ án môn **Trực quan hóa dữ liệu**: xử lý dữ liệu cơ bản → nhiều biểu đồ đa dạng → insight có số →
 dashboard chuẩn BI → chính sách giữ chân. Mô hình ML chỉ là phần phụ, đã có sẵn.
@@ -15,8 +17,9 @@ dashboard chuẩn BI → chính sách giữ chân. Mô hình ML chỉ là phần
 ## Cấm
 - Sửa `data/cell2celltrain.csv`, notebook `work/pipeline/01–03`, `pages_src/`, `export_pages.py`, `.github/workflows/` (token push không có quyền workflow).
 - Train lại mô hình, thêm manifest/hash/verify/audit script mới.
-- **Ngoại lệ duy nhất: task T9** trong [`docs/TASK_T9_NANG_CAP_MO_HINH.md`](docs/TASK_T9_NANG_CAP_MO_HINH.md) được sửa
-  notebook 03 và train lại mô hình, đúng phạm vi ghi trong file đó.
+- T9 (nâng cấp mô hình lên 52 cột, [`docs/TASK_T9_NANG_CAP_MO_HINH.md`](docs/TASK_T9_NANG_CAP_MO_HINH.md)) **đã xong**.
+  Không còn ngoại lệ nào: không sửa notebook 01–03, không train lại.
+- Chạy lại pipeline để kiểm tra thì được, nhưng **không commit** output notebook/ảnh sinh ra (xem T10).
 - Hard-code số liệu (churn rate, n...) trong code hoặc tiêu đề biểu đồ; mọi số phải tính từ dữ liệu.
 - Commit `.venv/`, `work/build/`, file dữ liệu sinh ra.
 - Viết dài dòng caveat trên dashboard (tối đa 1 footnote/trang).
