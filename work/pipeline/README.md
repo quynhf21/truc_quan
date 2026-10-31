@@ -31,4 +31,4 @@ Thêm `--cwd project` để kiểm tra notebook khi working directory là projec
 
 `verify_notebooks.py` kiểm tra execution count, lỗi, output bảng/biểu đồ; đồng thời thử dữ liệu hợp lệ, thiếu manifest/processed, raw/QA/parquet bị đổi và manifest chưa PASS trong fixture riêng.
 
-Phần modeling giữ phạm vi 10 feature, depth 4/6, tối đa 450 vòng; cấu hình CPU 4 threads được in trong notebook. Kết quả mới nhất nằm trong output notebook 03 và `work/build/model_metrics.json`; không ép metric bằng kết quả lịch sử. Đây là đợt viết lại notebook, chưa thực hiện benchmark/tối ưu mô hình.
+Phần modeling (v2) dùng 52 cột nguồn, depth 4/6, tối đa 1500 vòng; cấu hình CPU 4 threads được in trong notebook. Kết quả mới nhất nằm trong output notebook 03 và `work/build/model_metrics.json`; không ép metric bằng kết quả lịch sử. So sánh với Logistic regression và LightGBM nằm ở `work/experiments/compare_models.py`.

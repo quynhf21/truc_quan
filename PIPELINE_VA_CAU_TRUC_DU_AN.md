@@ -133,7 +133,7 @@ File thực thi: `work/pipeline/03_model_training_and_evaluation.ipynb`.
 
 Xử lý mô hình:
 
-- dùng đúng 10 feature trong `project_contract.md`;
+- dùng 52 cột nguồn theo `project_contract.md` mục 5 (10 base feature từ notebook 01 + các cột còn lại ghép từ raw CSV);
 - `CustomerID` không được dùng làm predictor;
 - dùng CatBoost để xử lý đồng thời feature numeric, categorical và missing;
 - outer `StratifiedKFold` 3 fold tạo `RiskScore` ngoài mẫu cho toàn bộ khách hàng;

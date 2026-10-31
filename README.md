@@ -54,7 +54,7 @@ docs/PLAN_TRUC_QUAN_HOA.md         plan làm lại theo hướng trực quan hó
 4. Khách đã nhận ưu đãi giữ chân vẫn churn 41,1%: chương trình hiện tại kém hiệu quả.
 5. Khách im lặng (không gọi CSKH, ít dùng) churn cao hơn khách hay phàn nàn.
 6. Chênh lệch 12 điểm % giữa các vùng; 20/53 vùng chiếm 80% churner.
-7. 4 phân khúc cần can thiệp (24.622 khách, churn 35–45%), doanh thu bị đe dọa ≈ $518 nghìn/tháng.
+7. 4 phân khúc cần can thiệp (25.319 khách, churn 35–45%), doanh thu bị đe dọa ≈ $534 nghìn/tháng.
 
 ---
 
@@ -142,7 +142,7 @@ Raw không bị sửa. Ba notebook tạo các artifact tái lập trong `work/bu
 | `model_metrics.json` | Depth được chọn trong inner train, metric ngoài mẫu, lift@capacity |
 | `policy_matrix.csv` | Điều kiện, treatment giả thuyết, KPI và guardrail |
 
-`CustomerID` chỉ dùng để đối soát, không là predictor. Mô hình chỉ dùng 10 feature đã khóa ở [project_contract.md](project_contract.md). CatBoost xử lý missing ở numeric và categorical unknown; không loại 1.295 dòng để lấy complete-case toàn bộ 58 cột. Các giá trị âm bất thường được ghi trong QA và giữ nguyên ở bảng nguồn; band biểu đồ gắn nhãn `Giá trị âm` khi thích hợp.
+`CustomerID` chỉ dùng để đối soát, không là predictor. Mô hình v2 dùng 52 cột nguồn (trừ ID, target, `ServiceArea` và 3 trường retention) theo [project_contract.md](project_contract.md) mục 5. CatBoost xử lý missing ở numeric và categorical unknown; không loại 1.295 dòng để lấy complete-case toàn bộ 58 cột. Các giá trị âm bất thường được ghi trong QA và giữ nguyên ở bảng nguồn; band biểu đồ gắn nhãn `Giá trị âm` khi thích hợp.
 
 #### Mẫu số và benchmark
 
