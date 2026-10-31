@@ -21,17 +21,17 @@ python -m pip install -r work/requirements.txt
 | Bước | Lệnh | Kết quả | Thời gian |
 |---|---|---|---|
 | 1 (tùy chọn) | `python work/pipeline/run_all.py` | Điểm rủi ro CatBoost 52 cột `work/build/customer_mart.parquet` | 8–15 phút |
-| 2 | `python work/viz/prepare_viz_data.py` | `work/build/viz_customers.parquet` (51.047 dòng) | vài giây |
+| 2 (tùy chọn) | `python work/viz/prepare_viz_data.py` | Bảng phân tích sau khi loại số âm bất thường | vài giây |
 | 3 | Mở notebook 04 và chạy tất cả các ô; hoặc `jupyter nbconvert --to notebook --execute --inplace work/viz/04_eda_truc_quan.ipynb` | Output, PNG và bộ kết quả dashboard trong `work/build/dashboard/` | vài phút |
 | 4 | `python work/dashboard/dashboard.py` | Dashboard tại http://127.0.0.1:8050/ | — |
 
 - Bỏ qua bước 1 thì dashboard vẫn chạy, chỉ ẩn phần điểm rủi ro, gain curve và nhóm "Rủi ro cao (mô hình)".
-- Chạy bước 1 sau bước 2 thì phải chạy lại bước 2 để ghép điểm rủi ro.
+- Notebook 04 tự đọc nguồn, kiểm tra, loại số âm bất thường và tạo bảng phân tích; không bắt buộc chạy bước 2 trước.
 - Bước 3 là bắt buộc trước khi mở dashboard. Notebook xuất biểu đồ Plotly và bản dữ liệu cùng lần chạy. Khi cập nhật dữ liệu hoặc biểu đồ, chạy lại bước 2–3 rồi khởi động lại dashboard.
 - `work/build/` bị gitignore: máy mới clone về phải chạy lại từ bước 1 hoặc bước 2.
 - Bước 1 ghi lại output vào notebook 01–03. Nếu không muốn commit thay đổi đó: `git checkout -- work/pipeline/`.
 
-Kết quả đúng khi bước 2 in ra `51.047 dòng` và `Churn: 14.711 khách (28,82%)`.
+Nguồn hiện tại có 51.047 khách. Sau khi loại 85 dòng có số âm bất thường, bảng phân tích còn **50.962 khách**, gồm **14.695 khách rời bỏ (28,84%)**. Hai cột mức thay đổi vẫn giữ số âm hợp lệ. Notebook hiển thị bảng trước/sau và số trường hợp âm theo từng trường.
 
 Kiểm tra nhanh sau khi sửa code:
 
@@ -50,7 +50,7 @@ So sánh mô hình (CatBoost 10/52 cột, Logistic, LightGBM): `python work/expe
   Chỉ số và biểu đồ cập nhật theo lát cắt từ bản dữ liệu do notebook xuất. **Xóa lọc** đưa về toàn bộ khách và biểu đồ đã lưu.
 - **KPI:** ▲ đỏ = xấu hơn toàn công ty, ▼ xanh = tốt hơn.
 - **Biểu đồ:** rê chuột để xem số khách, số khách rời bỏ và tỷ lệ rời bỏ. Nút máy ảnh góc phải để tải PNG. Dashboard hiển thị tiêu đề trung tính; nhận xét và chính sách nằm trong notebook.
-- Thử nhanh: lọc "13–18 tháng" thì phải ra 11.917 khách, churn 31,6%.
+- Thử nhanh: lọc "13–18 tháng" trên bảng đã làm sạch thì có 11.902 khách, tỷ lệ rời bỏ 31,6%.
 
 ## 4. Cấu trúc và nơi cần sửa
 
@@ -71,7 +71,7 @@ Thêm một biểu đồ mới:
    và gọi `add_baseline(...)` nếu vẽ churn rate.
 2. Thêm vào `FIGURES` với khóa `Cxx_ten_khong_dau`.
 3. Chạy `python work/viz/smoke_test.py`.
-4. Thêm ô `show("Cxx_...")` và ô **Nhận xét** vào notebook; nếu cần hiện trên dashboard thì thêm tiêu đề vào `CHART_TITLES` và gọi `graph(...)` trong `page_*`. Chạy lại toàn bộ notebook để xuất kết quả.
+4. Thêm ô `show("Cxx_...")` và ô **Nhận xét** vào notebook; nếu cần hiện trên dashboard thì thêm tiêu đề vào `CHART_TITLES` và gọi `graph(...)` trong `page_*`. Chạy lại toàn bộ notebook để xuất kết quả. C05 gồm hai hình riêng: đường tỷ lệ rời bỏ và cột chồng số khách rời bỏ/ở lại theo tháng.
 
 Các file **không** sửa: `data/cell2celltrain.csv`, notebook `work/pipeline/01–03`, `pages_src/`, `export_pages.py`
 (bản cũ, xem [`AGENTS.md`](AGENTS.md)).

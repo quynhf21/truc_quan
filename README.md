@@ -7,7 +7,7 @@ rời bỏ, giải thích tín hiệu đi kèm và đề xuất chính sách gi�
 
 | Sản phẩm | File |
 |---|---|
-| Notebook phân tích + 20 biểu đồ + insight | [`work/viz/04_eda_truc_quan.ipynb`](work/viz/04_eda_truc_quan.ipynb) |
+| Notebook phân tích + 22 biểu đồ + nhận xét | [`work/viz/04_eda_truc_quan.ipynb`](work/viz/04_eda_truc_quan.ipynb) |
 | Dashboard BI 4 trang (Dash) | [`work/dashboard/dashboard.py`](work/dashboard/dashboard.py) · ảnh: [`reports/dashboard/`](reports/dashboard/) |
 | Insight & chính sách giữ chân | [`INSIGHTS_AND_POLICY.md`](INSIGHTS_AND_POLICY.md) |
 | Hướng dẫn chạy, dùng dashboard, chỉnh sửa | [`HUONG_DAN.md`](HUONG_DAN.md) |
@@ -34,12 +34,14 @@ Kiểm tra nhanh mọi hàm vẽ: `python work/viz/smoke_test.py`.
 
 Dashboard đọc bộ kết quả trong `work/build/dashboard/` do ô cuối notebook 04 xuất ra: bản dữ liệu phân tích và biểu đồ Plotly. Cần chạy toàn bộ notebook trước khi mở dashboard; chạy lại notebook rồi khởi động lại dashboard khi cập nhật kết quả. Dashboard chỉ hiển thị chỉ số, biểu đồ và bảng phân khúc; nhận xét và chính sách giữ chân nằm trong notebook và tài liệu.
 
+Notebook 04 tự chuẩn bị dữ liệu khi chạy từ đầu: nguồn 51.047 khách được loại 85 dòng có số âm bất thường, còn 50.962 khách (tỷ lệ rời bỏ 28,84%). Số âm ở hai trường mức thay đổi được giữ vì biểu thị giảm. C05 được tách thành đường tỷ lệ rời bỏ và cột chồng số khách rời bỏ/ở lại theo tháng.
+
 ## Cấu trúc
 
 ```
 data/cell2celltrain.csv            nguồn raw (không sửa)
 work/viz/prepare_viz_data.py       làm sạch, band, Region, ActionSegment, ghép điểm rủi ro
-work/viz/charts.py                 bảng màu + 20 hàm vẽ Plotly dùng chung cho notebook và dashboard
+work/viz/charts.py                 bảng màu + 22 biểu đồ Plotly dùng chung cho notebook và dashboard
 work/viz/04_eda_truc_quan.ipynb    EDA trực quan, insight, phân khúc, chính sách
 work/dashboard/dashboard.py        dashboard: Tổng quan · Thiết bị và dịch vụ · Hồ sơ và rủi ro · Phân khúc
 work/build/dashboard/              bộ kết quả notebook: dữ liệu và biểu đồ Plotly (tạo khi chạy, không đưa vào Git)
@@ -51,13 +53,13 @@ docs/PLAN_TRUC_QUAN_HOA.md         plan làm lại theo hướng trực quan hó
 
 ## Insight chính
 
-1. Churn **28,8%**; doanh thu tháng của khách đã rời bỏ ≈ $849 nghìn.
+1. Tỷ lệ rời bỏ **28,8%** sau xử lý; doanh thu tháng của nhóm rời bỏ là $847,7 nghìn.
 2. **Đỉnh hết hợp đồng:** churn vọt từ ~15% (tháng 7–9) lên **44,6% ở tháng 11**.
 3. Máy > 2 năm churn 36,1% (gấp 1,6 lần máy mới); máy không hỗ trợ web 37,4%.
-4. Khách đã nhận ưu đãi giữ chân vẫn churn 41,1%: chương trình hiện tại kém hiệu quả.
+4. Nhóm đã nhận ưu đãi giữ chân có tỷ lệ rời bỏ 41,2%; cần kiểm tra bằng thử nghiệm đối chứng để kết luận hiệu quả.
 5. Khách im lặng (không gọi CSKH, ít dùng) churn cao hơn khách hay phàn nàn.
 6. Chênh lệch 12 điểm % giữa các vùng; 20/53 vùng chiếm 80% churner.
-7. 4 phân khúc cần can thiệp (25.319 khách, churn 35–45%), doanh thu bị đe dọa ≈ $534 nghìn/tháng.
+7. Các phân khúc ưu tiên gồm 25.274 khách; doanh thu ước tính có rủi ro là $534,1 nghìn/tháng.
 
 ---
 

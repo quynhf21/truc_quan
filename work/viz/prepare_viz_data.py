@@ -26,6 +26,17 @@ CATEGORICAL = [
     "CreditRating", "IncomeGroup", "PrizmCode", "Occupation", "MaritalStatus",
 ]
 
+# Các mức thay đổi có thể âm hợp lệ; các đại lượng còn lại không được âm.
+SIGNED_COLUMNS = {"PercChangeMinutes", "PercChangeRevenues"}
+NON_NEGATIVE_COLUMNS = [column for column in NUMERIC if column not in SIGNED_COLUMNS]
+
+
+def remove_invalid_negative_rows(raw: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
+    """Loại dòng có số âm bất thường, kèm số trường hợp theo từng cột để đối soát."""
+    negative = raw[NON_NEGATIVE_COLUMNS].lt(0)
+    counts = negative.sum().loc[lambda values: values.gt(0)].astype(int)
+    return raw.loc[~negative.any(axis=1)].copy(), counts
+
 # Ngưỡng band công khai; pd.cut đóng bên phải.
 BANDS = {
     "TenureBand": ("MonthsInService", [0, 6, 12, 18, 24, 36, np.inf],
@@ -40,7 +51,7 @@ BANDS = {
 
 def add_bands(df: pd.DataFrame) -> pd.DataFrame:
     for band, (col, bins, labels) in BANDS.items():
-        values = pd.cut(df[col], bins=bins, labels=labels).astype("object")
+        values = pd.cut(df[col], bins=bins, labels=labels, include_lowest=True).astype("object")
         values[df[col].lt(0)] = "Bất thường"
         values[df[col].isna()] = "Không rõ"
         order = labels + [x for x in ["Bất thường", "Không rõ"] if x in set(values)]
@@ -68,8 +79,10 @@ def add_segment(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def build() -> pd.DataFrame:
-    raw = pd.read_csv(RAW, na_values=["NA"])
+def prepare_data(raw: pd.DataFrame) -> pd.DataFrame:
+    """Chuẩn hóa bảng đã kiểm tra; không đọc lại dữ liệu nguồn hoặc huấn luyện mô hình."""
+    if raw[NON_NEGATIVE_COLUMNS].lt(0).any().any():
+        raise ValueError("Dữ liệu còn số âm bất thường. Hãy chạy remove_invalid_negative_rows trước.")
     df = raw[["CustomerID", "Churn", *NUMERIC, *CATEGORICAL]].copy()
     if not df.Churn.isin(["Yes", "No"]).all():
         raise SystemExit("Cột Churn có giá trị khác Yes/No.")
@@ -89,6 +102,12 @@ def build() -> pd.DataFrame:
     return add_segment(df)
 
 
+def build() -> pd.DataFrame:
+    raw = pd.read_csv(RAW, na_values=["NA"])
+    cleaned, _ = remove_invalid_negative_rows(raw)
+    return prepare_data(cleaned)
+
+
 def fmt_n(value) -> str:
     return f"{int(value):,}".replace(",", ".")
 
@@ -98,12 +117,17 @@ def fmt_pct(value) -> str:
 
 
 def main() -> None:
-    df = build()
+    raw = pd.read_csv(RAW, na_values=["NA"])
+    cleaned, negative_counts = remove_invalid_negative_rows(raw)
+    df = prepare_data(cleaned)
     BUILD.mkdir(parents=True, exist_ok=True)
     df.to_parquet(OUT, index=False)
 
     print(f"Đã ghi {OUT.relative_to(ROOT)}: {fmt_n(len(df))} dòng, {df.shape[1]} cột")
-    print(f"Churn: {fmt_n(df.ChurnFlag.sum())} khách ({fmt_pct(df.ChurnFlag.mean())})")
+    print(f"Đã loại {fmt_n(len(raw) - len(cleaned))} dòng có số âm bất thường; còn {fmt_n(len(cleaned))} khách.")
+    print("Số âm theo cột (một dòng có thể xuất hiện ở nhiều cột):")
+    print(negative_counts.to_string() if len(negative_counts) else "Không có.")
+    print(f"Rời bỏ: {fmt_n(df.ChurnFlag.sum())} khách ({fmt_pct(df.ChurnFlag.mean())})")
     missing = df[NUMERIC].isna().mean().loc[lambda s: s.gt(0)].sort_values(ascending=False)
     print("\n% missing (cột numeric có missing):")
     print((100 * missing).round(2).to_string())

@@ -39,7 +39,8 @@ PAGES = [
 ]
 CHART_TITLES = {
     "C01_ty_le_churn": "Cơ cấu khách hàng",
-    "C05_vong_doi": "Tỷ lệ rời bỏ và số khách theo tháng sử dụng",
+    "C05_vong_doi": "Tỷ lệ rời bỏ theo tháng sử dụng",
+    "C05b_so_khach": "Số khách rời bỏ và ở lại theo tháng sử dụng",
     "C06_tuoi_thiet_bi": "Tỷ lệ rời bỏ theo tuổi thiết bị",
     "C07_heatmap_tenure_thiet_bi": "Tỷ lệ rời bỏ theo thời gian sử dụng và tuổi thiết bị",
     "C08_retention_funnel": "Liên hệ và ưu đãi giữ chân",
@@ -139,6 +140,7 @@ def page_overview(data):
     ], className="kpi-grid five")
     return [cards, html.Div([
         graph("C05_vong_doi", data, wide=True),
+        graph("C05b_so_khach", data, wide=True),
         graph("C01_ty_le_churn", data),
         graph("C14_treemap_vung", data),
         graph("C13_vung", data, wide=True),

@@ -281,22 +281,41 @@ def tenure_line(df: pd.DataFrame, max_month=48) -> go.Figure:
         return empty_figure()
     base = baseline(df)
     peak = table.loc[table.rate.idxmax()]
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, row_heights=[0.68, 0.32], vertical_spacing=0.06)
+    fig = go.Figure()
     fig.add_trace(go.Scatter(x=table.MonthsInService, y=table.rate, mode="lines+markers", name="Tỷ lệ rời bỏ",
                              line=dict(color=CHURN, width=2.5), marker=dict(size=5), customdata=_hover(table),
-                             hovertemplate=HOVER.replace("%{x}", "Tháng %{x}")), row=1, col=1)
-    fig.add_trace(go.Bar(x=table.MonthsInService, y=table.n, name="Số khách", marker_color=NEUTRAL,
-                         hovertemplate="Tháng %{x}: %{y:,.0f} khách<extra></extra>"), row=2, col=1)
-    fig.add_hline(y=base, line_dash="dash", line_color=MUTED, line_width=1, row=1, col=1,
+                             hovertemplate=HOVER.replace("%{x}", "Tháng %{x}")))
+    fig.add_hline(y=base, line_dash="dash", line_color=MUTED, line_width=1,
                   annotation_text=f"Trung bình {fmt_pct(base)}", annotation_position="bottom right",
                   annotation_font=dict(color=MUTED, size=11))
-    fig.update_yaxes(tickformat=".0%", title="Tỷ lệ rời bỏ", row=1, col=1, rangemode="tozero")
-    fig.update_yaxes(title="Số khách", row=2, col=1)
-    fig.update_xaxes(title="Số tháng sử dụng dịch vụ", row=2, col=1, dtick=6)
+    fig.update_yaxes(tickformat=".0%", title="Tỷ lệ rời bỏ", rangemode="tozero")
+    fig.update_xaxes(title="Số tháng sử dụng dịch vụ", dtick=6)
     fig = apply_style(fig, f"Tỷ lệ rời bỏ vọt lên {fmt_pct(peak.rate)} ở tháng {int(peak.MonthsInService)}: thời điểm hết hợp đồng 1 năm",
                       f"Tỷ lệ rời bỏ theo từng tháng (chỉ tháng có ≥{MIN_N} khách, tối đa {max_month} tháng)", height=460)
     fig.update_layout(showlegend=False)
     return fig
+
+
+def tenure_stacked(df: pd.DataFrame) -> go.Figure:
+    table = rate_by(df.dropna(subset=["MonthsInService"]), "MonthsInService").sort_values("MonthsInService")
+    if table.empty:
+        return empty_figure()
+    fig = go.Figure()
+    for name, counts, color in [
+        ("Rời bỏ", table.churners, CHURN),
+        ("Ở lại", table.n - table.churners, STAY),
+    ]:
+        fig.add_trace(go.Bar(
+            x=table.MonthsInService, y=counts, name=name, marker_color=color,
+            customdata=_hover(table),
+            hovertemplate="<b>Tháng %{x}</b><br>%{fullData.name}: %{y:,.0f} khách"
+                          "<br>Tổng khách: %{customdata[0]}<br>Tỷ lệ rời bỏ: %{customdata[2]}<extra></extra>",
+        ))
+    fig.update_layout(barmode="stack", bargap=0.16)
+    fig.update_xaxes(title="Thời gian sử dụng dịch vụ (tháng)", dtick=6, rangemode="tozero")
+    fig.update_yaxes(title="Số khách hàng", rangemode="tozero", separatethousands=True)
+    return apply_style(fig, "Số khách rời bỏ và ở lại theo thời gian sử dụng dịch vụ",
+                       f"Mỗi cột là một tháng · {fmt_n(table.n.sum())} khách · toàn bộ thời gian sử dụng", height=460)
 
 
 def rate_bar(df: pd.DataFrame, col: str, label: str, order=None, horizontal=False, title=None, min_n=MIN_N,
@@ -659,6 +678,7 @@ FIGURES = {
                                                 "MonthlyRevenue": "Doanh thu/tháng ($)",
                                                 "OverageMinutes": "Phút vượt gói"}),
     "C05_vong_doi": tenure_line,
+    "C05b_so_khach": tenure_stacked,
     "C06_tuoi_thiet_bi": lambda df: rate_bar(df, "EquipmentAgeBand", "Máy", order=_cats(df, "EquipmentAgeBand")),
     "C07_heatmap_tenure_thiet_bi": tenure_equipment_heatmap,
     "C08_retention_funnel": retention_funnel,
