@@ -89,20 +89,28 @@ def build() -> pd.DataFrame:
     return add_segment(df)
 
 
+def fmt_n(value) -> str:
+    return f"{int(value):,}".replace(",", ".")
+
+
+def fmt_pct(value) -> str:
+    return f"{100 * value:.2f}%".replace(".", ",")
+
+
 def main() -> None:
     df = build()
     BUILD.mkdir(parents=True, exist_ok=True)
     df.to_parquet(OUT, index=False)
 
-    print(f"Đã ghi {OUT.relative_to(ROOT)}: {len(df):,} dòng, {df.shape[1]} cột")
-    print(f"Churn: {df.ChurnFlag.sum():,} khách ({df.ChurnFlag.mean():.2%})")
+    print(f"Đã ghi {OUT.relative_to(ROOT)}: {fmt_n(len(df))} dòng, {df.shape[1]} cột")
+    print(f"Churn: {fmt_n(df.ChurnFlag.sum())} khách ({fmt_pct(df.ChurnFlag.mean())})")
     missing = df[NUMERIC].isna().mean().loc[lambda s: s.gt(0)].sort_values(ascending=False)
     print("\n% missing (cột numeric có missing):")
     print((100 * missing).round(2).to_string())
     print("\nSố khách theo ActionSegment:")
     print(df.groupby("ActionSegment", observed=False).ChurnFlag.agg(n="size", churn_rate="mean").round(3).to_string())
     if "RiskDecile" in df:
-        print(f"\nRiskDecile có cho {df.RiskDecile.notna().sum():,} khách.")
+        print(f"\nRiskDecile có cho {fmt_n(df.RiskDecile.notna().sum())} khách.")
 
 
 if __name__ == "__main__":

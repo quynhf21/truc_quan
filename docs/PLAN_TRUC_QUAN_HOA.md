@@ -131,6 +131,8 @@ dashboard). Mỗi biểu đồ theo khuôn: **Markdown câu hỏi → code → b
 
 ## 5. Phân khúc hành động và chính sách giữ chân
 
+> **Cập nhật khi thực hiện (31/10/2026):** rule cuối cùng theo số liệu thật nằm trong `INSIGHTS_AND_POLICY.md`: cửa sổ hợp đồng là 10–13 tháng; bỏ "Sai gói" và "Im lặng" vì churn dưới trung bình sau khi tách các nhóm trước; thêm "Rủi ro cao (mô hình)".
+
 Tạo cột `ActionSegment` bằng rule đơn giản, có thứ tự ưu tiên (rule đầu tiên khớp thì gán):
 
 | Thứ tự | Segment | Điều kiện | Chính sách đề xuất | KPI đo |
