@@ -182,6 +182,74 @@ def apply_style(fig: go.Figure, title: str, subtitle: str = "", height=380) -> g
     )
     fig.update_xaxes(gridcolor=GRID, zeroline=False, automargin=True, title_font=dict(color=MUTED))
     fig.update_yaxes(gridcolor=GRID, zeroline=False, automargin=True, title_font=dict(color=MUTED))
+    return polish_labels(fig)
+
+
+def polish_labels(fig: go.Figure) -> go.Figure:
+    """Tách nhãn khỏi đường tham chiếu; không đổi dữ liệu hoặc thang trục."""
+    for shape in fig.layout.shapes:
+        shape.layer = "below"
+    for annotation in fig.layout.annotations:
+        if "Trung bình " in str(annotation.text) and annotation.yref != "paper":
+            annotation.update(
+                text=f"Nét đứt · {annotation.text}", x=0, y=1.02, xref="paper", yref="paper",
+                xanchor="left", yanchor="bottom", showarrow=False, bgcolor="white", borderpad=3,
+            )
+
+    for trace in fig.data:
+        text = getattr(trace, "text", None)
+        if trace.type == "funnel":
+            values = np.asarray(trace.x, dtype=float)
+            cutoff = max(values) * 0.2 if len(values) else 0
+            trace.update(textposition=["inside" if value > cutoff else "outside" for value in values],
+                         textfont=dict(color=INK, size=12))
+        elif trace.type == "bar" and text is not None:
+            trace.update(textfont=dict(color=INK, size=13), cliponaxis=False)
+            if trace.orientation != "h" and any("%" in str(value) for value in text):
+                values = np.asarray(trace.y, dtype=float)
+                cutoff = max(float(np.nanmax(values)) * 0.18, 0) if len(values) else 0
+                colors = trace.marker.color
+                colors = [colors] * len(values) if isinstance(colors, str) else list(colors) if colors is not None else []
+                trace.update(
+                    textposition=["inside" if value > cutoff else "outside" for value in values],
+                    insidetextanchor="middle", textangle=0, constraintext="inside",
+                    insidetextfont=dict(color=["white" if color in (CHURN, ACCENT) else INK for color in colors]),
+                    outsidetextfont=dict(color=INK, size=13),
+                )
+        elif trace.type == "scatter" and text is not None and "text" in (trace.mode or ""):
+            positions = trace.textposition or "top center"
+            positions = [positions] * len(text) if isinstance(positions, str) else positions
+            bubble = trace.marker.sizemode == "area"
+            for i, (x, y, label, position) in enumerate(zip(trace.x, trace.y, text, positions)):
+                if label is None or str(label) == "":
+                    continue
+                right, left = "right" in position, "left" in position
+                above, below = "top" in position, "bottom" in position
+                xshift = 12 if right else (-8 if left else 0)
+                yshift = 12 if above else (-12 if below else 0)
+                if bubble:
+                    radius = np.sqrt(float(trace.marker.size[i]) / (2 * trace.marker.sizeref))
+                    axis = fig.layout["yaxis" + (trace.yaxis or "y")[1:]]
+                    low, high = axis.range if axis.range else (min(trace.y), max(trace.y))
+                    fraction = (y - low) / (high - low) if high > low else 0.5
+                    xaxis = fig.layout["xaxis" + (trace.xaxis or "x")[1:]]
+                    xlow, xhigh = xaxis.range if xaxis.range else (min(trace.x), max(trace.x))
+                    nearby_above = any(
+                        other_y > y and abs(other_x - x) < 0.12 * (xhigh - xlow)
+                        and other_y - y < 0.18 * (high - low)
+                        for other_x, other_y in zip(trace.x, trace.y)
+                    )
+                    above = fraction < 0.2 or (fraction < 0.8 and not nearby_above)
+                    below = not above
+                    yshift = (radius + 16) * (1 if above else -1)
+                fig.add_annotation(
+                    x=x, y=y, xref=trace.xaxis or "x", yref=trace.yaxis or "y", text=str(label),
+                    showarrow=False, xshift=xshift, yshift=yshift,
+                    xanchor="left" if right else ("right" if left else "center"),
+                    yanchor="bottom" if above else ("top" if below else "middle"),
+                    bgcolor="white", borderpad=3, font=dict(color=INK, size=12),
+                )
+            trace.mode = "+".join(part for part in trace.mode.split("+") if part != "text") or "markers"
     return fig
 
 
