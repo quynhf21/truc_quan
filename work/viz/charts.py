@@ -188,7 +188,7 @@ def apply_style(fig: go.Figure, title: str, subtitle: str = "", height=380) -> g
 def polish_labels(fig: go.Figure) -> go.Figure:
     """Tách nhãn khỏi đường tham chiếu; không đổi dữ liệu hoặc thang trục."""
     for shape in fig.layout.shapes:
-        shape.layer = "below"
+        shape.layer = "above"
     for annotation in fig.layout.annotations:
         if "Trung bình " in str(annotation.text) and annotation.yref != "paper":
             annotation.update(
@@ -205,14 +205,23 @@ def polish_labels(fig: go.Figure) -> go.Figure:
                          textfont=dict(color=INK, size=12))
         elif trace.type == "bar" and text is not None:
             trace.update(textfont=dict(color=INK, size=13), cliponaxis=False)
-            if trace.orientation != "h" and any("%" in str(value) for value in text):
-                values = np.asarray(trace.y, dtype=float)
+            horizontal = trace.orientation == "h"
+            axis_ref = (trace.xaxis or "x") if horizontal else (trace.yaxis or "y")
+            references = [shape.x0 if horizontal else shape.y0 for shape in fig.layout.shapes
+                          if (shape.xref if horizontal else shape.yref) == axis_ref
+                          and (shape.x0 == shape.x1 if horizontal else shape.y0 == shape.y1)]
+            if any("%" in str(value) for value in text) and (not horizontal or references):
+                values = np.asarray(trace.x if horizontal else trace.y, dtype=float)
                 cutoff = max(float(np.nanmax(values)) * 0.18, 0) if len(values) else 0
                 colors = trace.marker.color
                 colors = [colors] * len(values) if isinstance(colors, str) else list(colors) if colors is not None else []
+                axis = fig.layout[axis_ref[0] + "axis" + axis_ref[1:]]
+                span = abs(axis.range[1] - axis.range[0]) if axis.range else max(float(np.nanmax(values)), 0.01)
+                near_label = any(abs(value / 2 - reference) < 0.04 * span
+                                 for value in values if value > cutoff for reference in references)
                 trace.update(
                     textposition=["inside" if value > cutoff else "outside" for value in values],
-                    insidetextanchor="middle", textangle=0, constraintext="inside",
+                    insidetextanchor="start" if near_label else "middle", textangle=0, constraintext="inside",
                     insidetextfont=dict(color=["white" if color in (CHURN, ACCENT) else INK for color in colors]),
                     outsidetextfont=dict(color=INK, size=13),
                 )
