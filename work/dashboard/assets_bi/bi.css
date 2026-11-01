@@ -25,7 +25,7 @@ a { color: inherit; text-decoration: none; }
 
 .main { flex: 1; min-width: 0; padding: 0 28px 24px; }
 .filters { position: sticky; top: 0; z-index: 10; background: var(--bg); display: grid;
-  grid-template-columns: repeat(3, minmax(140px, 1fr)) auto; gap: 12px; align-items: end;
+  grid-template-columns: repeat(4, minmax(140px, 1fr)) auto; gap: 12px; align-items: end;
   padding: 16px 0 14px; border-bottom: 1px solid var(--line); }
 .filter-label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 4px; }
 .reset { min-height: 44px; padding: 8px 16px; border: 1px solid var(--line); background: #fff; color: var(--accent);

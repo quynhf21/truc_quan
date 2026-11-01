@@ -27,53 +27,39 @@ MIN_N = 100  # nhóm nhỏ hơn ngưỡng này không đủ tin cậy để so s
 
 CREDIT_ORDER = ["1-Highest", "2-High", "3-Good", "4-Medium", "5-Low", "6-VeryLow", "7-Lowest"]
 
-FIELD_LABELS = {
-    "CustomerID": "Mã khách hàng", "Churn": "Trạng thái rời bỏ", "ChurnFlag": "Rời bỏ",
-    "MonthlyRevenue": "Doanh thu tháng", "MonthlyMinutes": "Phút gọi mỗi tháng",
-    "TotalRecurringCharge": "Phí định kỳ", "DirectorAssistedCalls": "Cuộc gọi qua tổng đài hỗ trợ",
-    "OverageMinutes": "Phút vượt gói", "RoamingCalls": "Cuộc gọi chuyển vùng",
-    "PercChangeMinutes": "Thay đổi phút gọi", "PercChangeRevenues": "Thay đổi doanh thu",
-    "DroppedCalls": "Cuộc gọi bị rớt", "BlockedCalls": "Cuộc gọi bị chặn",
-    "UnansweredCalls": "Cuộc gọi không trả lời", "CustomerCareCalls": "Cuộc gọi chăm sóc khách hàng",
-    "ThreewayCalls": "Cuộc gọi ba bên", "ReceivedCalls": "Cuộc gọi nhận được",
-    "OutboundCalls": "Cuộc gọi đi", "InboundCalls": "Cuộc gọi đến",
-    "PeakCallsInOut": "Cuộc gọi giờ cao điểm", "OffPeakCallsInOut": "Cuộc gọi ngoài giờ cao điểm",
-    "DroppedBlockedCalls": "Cuộc gọi rớt hoặc bị chặn", "CallForwardingCalls": "Cuộc gọi chuyển tiếp",
-    "CallWaitingCalls": "Cuộc gọi chờ", "MonthsInService": "Tháng sử dụng dịch vụ",
-    "UniqueSubs": "Số thuê bao đã đăng ký", "ActiveSubs": "Số thuê bao hoạt động",
-    "ServiceArea": "Mã vùng phục vụ", "Handsets": "Số thiết bị", "HandsetModels": "Số mẫu thiết bị",
-    "CurrentEquipmentDays": "Tuổi thiết bị", "AgeHH1": "Tuổi thành viên thứ nhất",
-    "AgeHH2": "Tuổi thành viên thứ hai", "ChildrenInHH": "Có trẻ em trong hộ",
-    "HandsetRefurbished": "Thiết bị tân trang", "HandsetWebCapable": "Thiết bị hỗ trợ mạng",
-    "TruckOwner": "Sở hữu xe tải", "RVOwner": "Sở hữu xe du lịch lưu động",
-    "Homeownership": "Tình trạng sở hữu nhà", "BuysViaMailOrder": "Mua hàng qua thư",
-    "RespondsToMailOffers": "Phản hồi ưu đãi qua thư", "OptOutMailings": "Từ chối nhận thư",
-    "NonUSTravel": "Du lịch ngoài Hoa Kỳ", "OwnsComputer": "Sở hữu máy tính",
-    "HasCreditCard": "Có thẻ tín dụng", "RetentionCalls": "Cuộc gọi giữ chân",
-    "RetentionOffersAccepted": "Số ưu đãi giữ chân được nhận", "NewCellphoneUser": "Người mới dùng điện thoại",
-    "NotNewCellphoneUser": "Người đã dùng điện thoại", "ReferralsMadeBySubscriber": "Số lượt giới thiệu",
-    "IncomeGroup": "Nhóm thu nhập", "OwnsMotorcycle": "Sở hữu xe máy",
-    "AdjustmentsToCreditRating": "Điều chỉnh hạng tín dụng", "HandsetPrice": "Giá thiết bị",
-    "MadeCallToRetentionTeam": "Đã gọi bộ phận giữ chân", "CreditRating": "Hạng tín dụng",
-    "PrizmCode": "Khu vực sinh sống", "Occupation": "Nghề nghiệp", "MaritalStatus": "Đã kết hôn",
-    "Region": "Vùng", "RetentionOfferAccepted": "Đã nhận ưu đãi giữ chân",
-    "TenureBand": "Nhóm thời gian sử dụng", "EquipmentAgeBand": "Nhóm tuổi thiết bị",
-    "CareCallsBand": "Nhóm cuộc gọi chăm sóc", "DroppedBand": "Nhóm cuộc gọi rớt",
-    "OverageBand": "Nhóm phút vượt gói", "MinutesBand": "Nhóm phút gọi",
-    "ActionSegment": "Phân khúc hành động", "RiskScore": "Điểm rủi ro", "RiskDecile": "Nhóm rủi ro",
-    "n": "Số khách", "churners": "Khách rời bỏ", "rate": "Tỷ lệ rời bỏ",
-    "revenue": "Tổng doanh thu tháng", "avg_revenue": "Doanh thu tháng trung bình",
-    "revenue_at_risk": "Doanh thu tháng bị đe dọa",
-}
+FIELD_LABELS = {'CustomerID': 'Mã khách hàng',
+ 'Churn': 'Trạng thái rời bỏ',
+ 'ChurnFlag': 'Rời bỏ',
+ 'MonthlyRevenue': 'Doanh thu tháng',
+ 'MonthlyMinutes': 'Phút gọi mỗi tháng',
+ 'TotalRecurringCharge': 'Phí định kỳ',
+ 'PercChangeMinutes': 'Thay đổi phút gọi',
+ 'PercChangeRevenues': 'Thay đổi doanh thu',
+ 'PeakCallsInOut': 'Cuộc gọi giờ cao điểm',
+ 'MonthsInService': 'Tháng sử dụng dịch vụ',
+ 'CurrentEquipmentDays': 'Tuổi thiết bị',
+ 'HandsetWebCapable': 'Thiết bị hỗ trợ web',
+ 'CreditRating': 'Hạng tín dụng',
+ 'TenureBand': 'Nhóm thời gian sử dụng',
+ 'EquipmentAgeBand': 'Nhóm tuổi thiết bị',
+ 'MinutesBand': 'Nhóm phút gọi',
+ 'ActionSegment': 'Phân khúc hành động',
+ 'RiskScore': 'Điểm rủi ro',
+ 'RiskDecile': 'Nhóm rủi ro',
+ 'n': 'Số khách',
+ 'churners': 'Khách rời bỏ',
+ 'rate': 'Tỷ lệ rời bỏ',
+ 'revenue': 'Tổng doanh thu tháng',
+ 'avg_revenue': 'Doanh thu tháng trung bình',
+ 'revenue_at_risk': 'Doanh thu tháng bị đe dọa',
+ 'ChargeBand': 'Nhóm phí định kỳ',
+ 'UsageTrendBand': 'Thay đổi phút gọi',
+ 'RevenueTrendBand': 'Thay đổi doanh thu',
+ 'PeakCallsBand': 'Nhóm cuộc gọi giờ cao điểm'}
 VALUE_LABELS = {
-    "CreditRating": dict(zip(CREDIT_ORDER, ["1-Cao nhất", "2-Cao", "3-Tốt", "4-Trung bình",
+    'CreditRating': dict(zip(CREDIT_ORDER, ["1-Cao nhất", "2-Cao", "3-Tốt", "4-Trung bình",
                                           "5-Thấp", "6-Rất thấp", "7-Thấp nhất"])),
-    "Occupation": {"Clerical": "Văn phòng", "Crafts": "Thủ công", "Homemaker": "Nội trợ",
-                   "Other": "Khác", "Professional": "Chuyên môn", "Retired": "Nghỉ hưu",
-                   "Self": "Tự kinh doanh", "Student": "Sinh viên"},
-    "PrizmCode": {"Other": "Khác", "Rural": "Nông thôn", "Suburban": "Ngoại ô", "Town": "Thị trấn"},
-    "Churn": {"Yes": "Rời bỏ", "No": "Ở lại"},
-    "Homeownership": {"Known": "Đã xác định"},
+    'Churn': {"Yes": "Rời bỏ", "No": "Ở lại"},
 }
 SUMMARY_LABELS = {"count": "Số giá trị", "mean": "Trung bình", "std": "Độ lệch chuẩn",
                   "min": "Nhỏ nhất", "max": "Lớn nhất", "50%": "Trung vị",
@@ -212,9 +198,6 @@ def empty_figure(message="Không có dữ liệu cho bộ lọc này") -> go.Fig
     return apply_style(fig, "")
 
 
-def scope_empty_figure() -> go.Figure:
-    """Giữ ô biểu đồ khi toàn bộ biến phân nhóm đã bị loại khỏi phạm vi."""
-    return empty_figure("Không còn biến phân nhóm trong bộ 10 biến mô hình; không thêm biến thay thế.")
 
 
 # ---------- C01–C02: tổng quan ----------
@@ -386,10 +369,9 @@ def tenure_equipment_heatmap(df: pd.DataFrame) -> go.Figure:
                        f"Ô trống: nhóm có < {MIN_N} khách", height=420)
 
 
-# ---------- C08–C12: hành vi dịch vụ ----------
+# ---------- C09–C12: thiết bị và mức sử dụng ----------
 
-def retention_funnel(df: pd.DataFrame) -> go.Figure:
-    return scope_empty_figure()
+
 
 
 
@@ -401,23 +383,25 @@ def device_grouped(df: pd.DataFrame) -> go.Figure:
     for value, name, color in [("Yes", "Có", STAY), ("No", "Không", ACCENT)]:
         part = table[table.HandsetWebCapable == value]
         fig.add_trace(go.Bar(
-            x=["Máy hỗ trợ mạng"] * len(part), y=part.rate, name=name, marker_color=color,
+            x=["Máy hỗ trợ web"] * len(part), y=part.rate, name=name, marker_color=color,
             text=[fmt_pct(rate) for rate in part.rate], textposition="outside", customdata=_hover(part),
-            hovertemplate=HOVER.replace("%{x}", f"Máy hỗ trợ mạng: {name}"),
+            hovertemplate=HOVER.replace("%{x}", f"Máy hỗ trợ web: {name}"),
         ))
     add_baseline(fig, baseline(df))
     fig.update_layout(barmode="group")
     fig.update_yaxes(tickformat=".0%", range=[0, max(float(table.rate.max()) * 1.25, 0.01)], title="Tỷ lệ rời bỏ")
-    title = "Thiết bị hỗ trợ mạng và tỷ lệ rời bỏ"
+    title = "Thiết bị hỗ trợ web và tỷ lệ rời bỏ"
     web_no = table[table.HandsetWebCapable == "No"]
     web_yes = table[table.HandsetWebCapable == "Yes"]
     if len(web_no) and len(web_yes):
-        title = f"Máy không hỗ trợ mạng có tỷ lệ rời bỏ {fmt_pct(web_no.rate.iloc[0])} so với {fmt_pct(web_yes.rate.iloc[0])} ở máy có mạng"
-    return apply_style(fig, title, f"n = {fmt_n(table.n.sum())} khách · so sánh Có / Không hỗ trợ mạng")
+        title = f"Máy không hỗ trợ web có tỷ lệ rời bỏ {fmt_pct(web_no.rate.iloc[0])} so với {fmt_pct(web_yes.rate.iloc[0])} ở máy có mạng"
+    return apply_style(fig, title, f"n = {fmt_n(table.n.sum())} khách · so sánh Có / Không hỗ trợ web")
 
 
 
-def overage_bubble(df: pd.DataFrame) -> go.Figure:
+
+
+def usage_bubble(df: pd.DataFrame) -> go.Figure:
     """Giữ bubble theo mức sử dụng, bỏ chiều vượt gói ngoài phạm vi."""
     data = df[~df.MinutesBand.isin(["Không rõ"])]
     table = rate_by(data, "MinutesBand", order=_cats(df, "MinutesBand"), min_n=MIN_N)
@@ -439,14 +423,18 @@ def overage_bubble(df: pd.DataFrame) -> go.Figure:
 
 
 
-# ---------- C13–C15: địa lý ----------
-
-def region_bar(df: pd.DataFrame, min_n=800) -> go.Figure:
-    return scope_empty_figure()
 
 
+# ---------- C14: phân bố khách theo thời gian sử dụng ----------
 
-def region_treemap(df: pd.DataFrame, top=12) -> go.Figure:
+
+
+
+
+
+
+
+def tenure_treemap(df: pd.DataFrame) -> go.Figure:
     """Giữ treemap và cấp tenure; loại cấp vùng phục vụ ngoài bộ 10."""
     table = rate_by(df, "TenureBand", order=_cats(df, "TenureBand"))
     table = table[table.churners > 0]
@@ -466,8 +454,9 @@ def region_treemap(df: pd.DataFrame, top=12) -> go.Figure:
 
 
 
-def region_pareto(df: pd.DataFrame) -> go.Figure:
-    return scope_empty_figure()
+
+
+
 
 
 
@@ -483,15 +472,10 @@ def credit_bar(df: pd.DataFrame) -> go.Figure:
                     title=f"Khách tín dụng tốt (hạng 1–3) có tỷ lệ rời bỏ {fmt_pct(good)}, cao hơn nhóm 4–7 ({fmt_pct(low)})")
 
 
-def demographic_multiples(df: pd.DataFrame) -> go.Figure:
-    return scope_empty_figure()
 
 
 
-CORR_COLUMNS = [
-    "ChurnFlag", "MonthsInService", "CurrentEquipmentDays", "MonthlyRevenue", "MonthlyMinutes",
-    "TotalRecurringCharge", "PercChangeMinutes", "PeakCallsInOut",
-]
+
 
 
 C18_FEATURES = [
@@ -674,24 +658,24 @@ def _cats(df, col):
 
 FIGURES = {
     "C01_ty_le_churn": churn_donut,
-    "C02_du_lieu_thieu": lambda df: missing_bar(df, CORR_COLUMNS[1:]),
+    "C02_du_lieu_thieu": lambda df: missing_bar(df, C18_FEATURES),
     "C03_phan_bo_tuoi_may": lambda df: distribution_overlay(df, "CurrentEquipmentDays", "Tuổi thiết bị"),
-    "C04_box_plot": lambda df: box_by_churn(df, {"CurrentEquipmentDays": "Tuổi thiết bị (ngày)",
-                                                "MonthlyRevenue": "Doanh thu/tháng ($)"}),
+    "C04_box_plot": lambda df: box_by_churn(df, {"CurrentEquipmentDays": "Tuổi thiết bị (ngày)", "MonthlyRevenue": "Doanh thu/tháng ($)"}),
+    "C04b_phan_bo_doanh_thu": lambda df: distribution_overlay(df, "MonthlyRevenue", "Doanh thu tháng ($)"),
+    "C04c_phan_bo_phi_dinh_ky": lambda df: distribution_overlay(df, "TotalRecurringCharge", "Phí định kỳ ($)"),
+    "C04d_churn_phi_dinh_ky": lambda df: rate_bar(df[df.ChargeBand.isin(["≤30", "30–60", ">60"])],
+                                                "ChargeBand", "Phí định kỳ", order=_cats(df, "ChargeBand"), base=baseline(df)),
     "C05_vong_doi": tenure_line,
     "C05b_so_khach": tenure_stacked,
     "C06_tuoi_thiet_bi": lambda df: rate_bar(df, "EquipmentAgeBand", "Máy", order=_cats(df, "EquipmentAgeBand")),
     "C07_heatmap_tenure_thiet_bi": tenure_equipment_heatmap,
-    "C08_retention_funnel": retention_funnel,
     "C09_dac_diem_thiet_bi": device_grouped,
-    "C10_goi_cskh": lambda df: scope_empty_figure(),
-    "C11_cuoc_goi_rot": lambda df: scope_empty_figure(),
-    "C12_goi_cuoc": overage_bubble,
-    "C13_vung": region_bar,
-    "C14_treemap_vung": region_treemap,
-    "C15_pareto_vung": region_pareto,
+    "C10_bien_dong_phut_goi": lambda df: rate_bar(df[df.UsageTrendBand != "Không rõ"], "UsageTrendBand", "Thay đổi phút gọi", order=_cats(df, "UsageTrendBand"), base=baseline(df)),
+    "C11_bien_dong_doanh_thu": lambda df: rate_bar(df[df.RevenueTrendBand != "Không rõ"], "RevenueTrendBand", "Thay đổi doanh thu", order=_cats(df, "RevenueTrendBand"), base=baseline(df)),
+    "C12_muc_su_dung": usage_bubble,
+    "C13_goi_gio_cao_diem": lambda df: rate_bar(df[df.PeakCallsBand != "Không rõ"], "PeakCallsBand", "Cuộc gọi giờ cao điểm", order=_cats(df, "PeakCallsBand"), horizontal=True, base=baseline(df)).update_yaxes(autorange="reversed"),
+    "C14_treemap_thoi_gian": tenure_treemap,
     "C16_tin_dung": credit_bar,
-    "C17_nhan_khau_hoc": demographic_multiples,
     "C18_tuong_quan": correlation_heatmap,
     "C19a_risk_decile": decile_bar,
     "C19b_gain_curve": gain_curve,

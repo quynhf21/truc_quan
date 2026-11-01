@@ -18,8 +18,10 @@ FEATURES = [
     "MonthlyRevenue", "TotalRecurringCharge", "CreditRating",
     "MonthlyMinutes", "PercChangeMinutes", "PercChangeRevenues", "PeakCallsInOut",
 ]
-CATEGORICAL = ["HandsetWebCapable", "CreditRating"]
-NUMERIC = [column for column in FEATURES if column not in CATEGORICAL]
+MODEL_CATEGORICAL = ["HandsetWebCapable", "CreditRating"]
+CATEGORICAL = MODEL_CATEGORICAL.copy()
+NUMERIC = [column for column in FEATURES if column not in MODEL_CATEGORICAL]
+EDA_COLUMNS = FEATURES.copy()
 
 # Các mức thay đổi có thể âm hợp lệ; các đại lượng còn lại không được âm.
 SIGNED_COLUMNS = {"PercChangeMinutes", "PercChangeRevenues"}
@@ -39,6 +41,8 @@ BANDS = {
     "EquipmentAgeBand": ("CurrentEquipmentDays", [-0.1, 180, 365, 730, np.inf],
                          ["≤180 ngày", "181–365 ngày", "366–730 ngày", ">730 ngày"]),
     "MinutesBand": ("MonthlyMinutes", [-0.1, 150, 500, np.inf], ["≤150 phút", "150–500 phút", ">500 phút"]),
+    "ChargeBand": ("TotalRecurringCharge", [-0.1, 30, 60, np.inf], ["≤30", "30–60", ">60"]),
+    "PeakCallsBand": ("PeakCallsInOut", [-0.1, 50, 150, 300, np.inf], ["≤50", "50–150", "150–300", ">300"]),
 }
 
 def add_bands(df: pd.DataFrame) -> pd.DataFrame:
@@ -48,6 +52,10 @@ def add_bands(df: pd.DataFrame) -> pd.DataFrame:
         values[df[col].isna()] = "Không rõ"
         order = labels + [x for x in ["Bất thường", "Không rõ"] if x in set(values)]
         df[band] = pd.Categorical(values, categories=order, ordered=True)
+    for column, band in [("PercChangeMinutes", "UsageTrendBand"), ("PercChangeRevenues", "RevenueTrendBand")]:
+        values = np.select([df[column].lt(0), df[column].eq(0), df[column].gt(0)],
+                           ["Giảm", "Không đổi", "Tăng"], default="Không rõ")
+        df[band] = pd.Categorical(values, categories=["Giảm", "Không đổi", "Tăng", "Không rõ"], ordered=True)
     return df
 
 
@@ -74,7 +82,7 @@ def prepare_data(raw: pd.DataFrame) -> pd.DataFrame:
     """Chuẩn hóa bảng đã kiểm tra; không đọc lại dữ liệu nguồn hoặc huấn luyện mô hình."""
     if raw[NON_NEGATIVE_COLUMNS].lt(0).any().any():
         raise ValueError("Dữ liệu còn số âm bất thường. Hãy chạy remove_invalid_negative_rows trước.")
-    df = raw[["CustomerID", "Churn", *FEATURES]].copy()
+    df = raw[["CustomerID", "Churn", *EDA_COLUMNS]].copy()
     if not df.Churn.isin(["Yes", "No"]).all():
         raise SystemExit("Cột Churn có giá trị khác Yes/No.")
     df["ChurnFlag"] = df.Churn.eq("Yes").astype(int)
@@ -112,7 +120,7 @@ def main() -> None:
     BUILD.mkdir(parents=True, exist_ok=True)
     df.to_parquet(OUT, index=False)
 
-    print(f"Đã ghi {OUT.relative_to(ROOT)}: {fmt_n(len(df))} dòng, {df.shape[1]} cột")
+    print(f"Đã ghi {OUT.relative_to(ROOT)}: {fmt_n(len(df))} dòng · {len(FEATURES)} biến mô hình")
     print(f"Đã loại {fmt_n(len(raw) - len(cleaned))} dòng có số âm bất thường; còn {fmt_n(len(cleaned))} khách.")
     print("Số âm theo cột (một dòng có thể xuất hiện ở nhiều cột):")
     print(negative_counts.to_string() if len(negative_counts) else "Không có.")

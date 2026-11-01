@@ -2,7 +2,7 @@
 
 Đọc **`docs/PLAN_TRUC_QUAN_HOA.md` trước khi làm bất cứ việc gì**. Đó là plan đã duyệt.
 
-Task hiện tại theo yêu cầu người dùng: mô hình và toàn bộ EDA chỉ dùng đúng 10 predictor đã chọn, nhãn rời bỏ và các đại lượng suy ra từ chúng. Bỏ chiều ngoài phạm vi khỏi từng biểu đồ; giữ biến hợp lệ và loại biểu đồ, không tự thêm biến thay thế. Biểu đồ hết biến phân nhóm giữ vị trí thông báo. Quy tắc phân khúc cũng không được dựa vào cột ngoài bộ 10. Các mốc 52 biến trong tài liệu T9/T10 là lịch sử.
+Task hiện tại theo yêu cầu người dùng: thống nhất mô hình, toàn bộ EDA và dashboard theo đúng 10 predictor của mô hình. Mỗi predictor phải có trực quan trực tiếp, gồm hai mức thay đổi và số cuộc gọi giờ cao điểm. Bỏ các biểu đồ/chiều chỉ dùng biến ngoài mô hình; không để ô trống. Có thể dùng nhãn rời bỏ, band và điểm suy ra từ bộ 10. Giữ form Plotly, bảng màu và các quy tắc C20 hiện tại; không huấn luyện lại. Các mốc 52 biến trong tài liệu T9/T10 là lịch sử.
 
 ## Mục tiêu
 Đồ án môn **Trực quan hóa dữ liệu**: xử lý dữ liệu cơ bản → nhiều biểu đồ đa dạng → insight có số →
@@ -15,8 +15,8 @@ dashboard chuẩn BI → chính sách giữ chân. Mô hình ML chỉ là phần
 - Không chắc yêu cầu → hỏi lại, không đoán.
 
 ## Cấm
-- Sửa `data/cell2celltrain.csv`, notebook `work/pipeline/01–02`, `pages_src/`, `export_pages.py`, `.github/workflows/` (token push không có quyền workflow).
-- Thêm manifest/hash/verify/audit script mới. Ngoại lệ cho task hiện tại: người dùng đã yêu cầu sửa notebook 03 và huấn luyện lại đúng bộ 10 biến; giữ giao thức đánh giá cũ, không tuning mở rộng.
+- Sửa `data/cell2celltrain.csv`, notebook `work/pipeline/01–03`, `pages_src/`, `export_pages.py`, `.github/workflows/` (token push không có quyền workflow).
+- Thêm manifest/hash/verify/audit script mới hoặc huấn luyện lại mô hình trong task bổ sung EDA hiện tại.
 - T9 (nâng cấp mô hình lên 52 cột, [`docs/TASK_T9_NANG_CAP_MO_HINH.md`](docs/TASK_T9_NANG_CAP_MO_HINH.md)) **đã xong**.
   Yêu cầu mới về 10 biến thay thế cấu hình T9; không dùng kết quả 52 biến làm kết quả hiện hành.
 - Chạy lại pipeline để kiểm tra thì được, nhưng **không commit** output notebook/ảnh sinh ra (xem T10).

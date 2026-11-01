@@ -1,43 +1,44 @@
-# Kịch bản thuyết trình — phạm vi 10 biến
+# Kịch bản thuyết trình — thống nhất 10 biến mô hình
 
-Mạch kể: **Vấn đề → Thiết bị và mức sử dụng → Rủi ro → Hành động**. Mở notebook 04 và dashboard tại http://127.0.0.1:8050/.
+Mô hình, notebook 04 và dashboard dùng cùng 10 predictor. `Churn` là nhãn; mã khách chỉ để đối soát. Các band và điểm rủi ro được suy ra từ bộ biến này. CSV nguồn được giữ nguyên, số cột trong CSV không phải số predictor được chọn.
 
-## 1. Giới thiệu và xử lý dữ liệu
+## 2.2. Phân tích thời gian sử dụng và thiết bị
 
-- CSV nguồn giữ nguyên; mô hình và EDA chỉ chọn đúng 10 predictor đã thống nhất. Mã khách phục vụ đối soát, `Churn` là nhãn, các band và điểm rủi ro là đại lượng suy ra.
-- Các cột gồm thời gian sử dụng, tuổi thiết bị, hỗ trợ web, doanh thu tháng, phí định kỳ, hạng tín dụng, phút gọi, hai mức thay đổi và cuộc gọi giờ cao điểm.
-- Notebook tự tính số dòng trước/sau xử lý và số giá trị thiếu. Giữ số âm hợp lệ ở hai mức thay đổi; loại số âm bất thường ở các đại lượng không thể âm.
+- `MonthsInService`: C05/C05b là đường tỷ lệ và cột chồng số khách theo tháng; C14 là treemap số khách rời bỏ theo nhóm thời gian sử dụng.
+- `CurrentEquipmentDays`: C03 phân bố tuổi máy, C04 box plot, C06 bar theo tuổi thiết bị, C07 kết hợp với thời gian sử dụng.
+- `HandsetWebCapable`: C09 grouped bar Có/Không hỗ trợ truy cập web.
+- Đỉnh quanh một năm là tín hiệu quan sát, chưa xác nhận nguyên nhân hết hợp đồng.
 
-## 2. Tổng quan và thiết bị
+## 2.3. Phân tích doanh thu, cước phí và mức sử dụng
 
-- C01 cho biết tỷ lệ rời bỏ và quy mô mẫu; đọc số hiển thị của lần chạy hiện tại.
-- C05 giữ đường tỷ lệ và cột chồng số khách theo tháng sử dụng. Đỉnh quanh một năm là tín hiệu cần khảo sát, chưa xác nhận nguyên nhân hết hợp đồng.
-- C04 chỉ còn box plot tuổi thiết bị và doanh thu. C06/C07 giữ nhóm tuổi máy và kết hợp với thời gian sử dụng.
-- C09 giữ grouped bar Có/Không hỗ trợ web; không còn nhóm máy tân trang.
+- `MonthlyRevenue`: C04 box plot và C04b histogram chồng giữa nhóm rời bỏ/ở lại.
+- `TotalRecurringCharge`: C04c histogram chồng, C04d bar tỷ lệ rời bỏ theo nhóm phí có baseline toàn mẫu.
+- `MonthlyMinutes`: C12 bubble theo nhóm phút gọi, kích thước là số khách, trục dọc là tỷ lệ rời bỏ.
 
-## 3. Mức sử dụng và phân bố
+## 2.4. Phân tích biến động mức sử dụng và doanh thu
 
-- C12 vẫn là bubble: nhóm phút gọi trên trục ngang, tỷ lệ rời bỏ trên trục dọc, kích thước là số khách. Chiều phân màu ngoài phạm vi đã bỏ.
-- C14 vẫn là treemap, chỉ còn cấp thời gian sử dụng: diện tích cho biết số khách rời bỏ, màu cho biết tỷ lệ.
-- C16 so sánh hạng tín dụng. C18 thể hiện tương quan của 10 predictor và nhãn rời bỏ, có ghi rõ cách mã hóa hai biến phân loại.
+- `PercChangeMinutes`: C10 bar theo các nhóm Giảm, Không đổi, Tăng.
+- `PercChangeRevenues`: C11 giữ cùng form bar và baseline.
+- Chỉ phân nhóm theo dấu của giá trị nguồn; chưa gọi đây là phần trăm thay đổi khi chưa xác nhận đơn vị. Đọc số khách và nhận xét được tính lại trong notebook.
 
-## 4. Mô hình và hành động
+## 2.5. Phân tích cuộc gọi giờ cao điểm
 
-- CatBoost 10 biến: ROC-AUC ngoài mẫu 0,6725, AP 0,4549, lift top 10% toàn nguồn 1,88×. C19 dùng đúng điểm đã chạy lại.
-- C20 chỉ còn các nhóm Hết hợp đồng, Máy cũ, Rủi ro cao theo mô hình và Ổn định. Điều kiện và số liệu cụ thể nằm trong bảng phân khúc và báo cáo insight hiện hành.
-- So sánh C20, C20b và C20c: vị trí rủi ro/giá trị, quy mô doanh thu bị đe dọa và tỷ lệ rời bỏ là ba góc nhìn khác nhau.
-- Chính sách là đề xuất; cần thử nghiệm đối chứng để đo hiệu quả giữ chân.
+- `PeakCallsInOut`: C13 bar ngang theo nhóm số cuộc gọi giờ cao điểm, kèm churn trung bình.
+- Đây là số cuộc gọi giờ cao điểm, không phải số lần liên hệ CSKH hoặc hoạt động giữ chân.
 
-## 5. Các vị trí không còn biến phù hợp
+## 2.6. Phân tích hạng tín dụng khách hàng
 
-C08, C10, C11, C13, C15 và C17 giữ ô thông báo vì toàn bộ biến phân nhóm cũ nằm ngoài bộ 10. Không trình bày chúng như kết quả phân tích và không tự dùng biến khác để thay thế.
+- `CreditRating`: C16 giữ đúng thứ tự hạng 1–7. Không suy diễn thu nhập, nghề nghiệp hoặc hôn nhân từ hạng tín dụng.
 
-## Câu hỏi thường gặp
+## 2.7. Phân tích tương quan giữa các biến
 
-| Câu hỏi | Trả lời |
-|---|---|
-| Vì sao CSV vẫn có nhiều cột? | Giữ nguyên dữ liệu nguồn; bảng phân tích chỉ chọn đúng 10 predictor, ID/nhãn và các đại lượng suy ra. |
-| Mười biến hay mười một biến ở C18? | Mười predictor cộng nhãn rời bỏ để tính tương quan; nhãn không vào mô hình. |
-| Vì sao một số ô không còn hình? | Sau khi bỏ biến ngoài bộ 10, ô đó không còn biến phân nhóm hợp lệ. Giữ vị trí và thông báo thay vì tạo nội dung thay thế. |
-| Mô hình có đổi sau khi thu gọn EDA? | Không. Chỉ bỏ biến ngoài phạm vi khỏi biểu đồ và các quy tắc phụ thuộc chúng. |
-| Doanh thu bị đe dọa tính thế nào? | Tổng doanh thu tháng của nhóm × tỷ lệ rời bỏ; chưa phải lợi nhuận hay số tiền chắc chắn giữ được. |
+- C18 có đúng 10 predictor cộng nhãn rời bỏ. Hai biến phân loại được mã hóa rõ trong notebook.
+- Tương quan tuyến tính không phải mức độ quan trọng trong CatBoost và không chứng minh nhân quả.
+
+## Mô hình và hành động
+
+- Mô hình đã chạy dùng 10 biến: ROC-AUC ngoài mẫu 0,6725, AP 0,4549, lift top 10% toàn nguồn 1,88×. Việc thay biểu đồ không huấn luyện lại hoặc đổi điểm.
+- C19 dùng điểm đó để phân tầng và đánh giá phạm vi liên hệ. C20/C20b/C20c giữ nguyên các nhóm Hết hợp đồng, Máy cũ, Rủi ro cao theo mô hình và Ổn định.
+- Chính sách cần thử nghiệm đối chứng; doanh thu tháng bị đe dọa chưa phải số tiền chắc chắn giữ được.
+
+Các biểu đồ chỉ dùng biến ngoài mô hình đã được bỏ khỏi notebook và dashboard; không giữ ô thông báo trống.
