@@ -492,18 +492,40 @@ def region_treemap(df: pd.DataFrame, top=12) -> go.Figure:
     data = df.assign(Region=df.Region.where(df.Region.isin(top_regions), "Vùng khác"))
     table = (data.groupby(["Region", "TenureBand"], observed=True)[TARGET]
              .agg(n="size", churners="sum").reset_index())
-    table = table[table.churners > 0]
-    table["rate"] = table.churners / table.n
-    fig = px.treemap(table, path=[px.Constant("Tất cả"), "Region", "TenureBand"], values="churners",
-                     color="rate", color_continuous_scale="Reds", custom_data=["n", "rate"])
-    fig.update_traces(hovertemplate="<b>%{label}</b><br>Khách rời bỏ: %{value:,.0f}<extra></extra>",
-                      texttemplate="%{label}<br>%{value:,.0f}", root_color="white")
-    fig.update_coloraxes(colorbar=dict(tickformat=".0%", title="Tỷ lệ rời bỏ"))
+    regions = data.groupby("Region", observed=True)[TARGET].agg(n="size", churners="sum")
+    nodes = [("Tất cả", "", "Tất cả", len(data), int(data[TARGET].sum()))]
+    for region, row in regions.sort_values("churners", ascending=False).iterrows():
+        if row.churners > 0:
+            nodes.append((f"Tất cả/{region}", "Tất cả", str(region), int(row.n), int(row.churners)))
+    for row in table.loc[table.churners > 0].itertuples():
+        parent = f"Tất cả/{row.Region}"
+        nodes.append((f"{parent}/{row.TenureBand}", parent, str(row.TenureBand), int(row.n), int(row.churners)))
+
+    rates = [churners / n for _, _, _, n, churners in nodes]
+    fig = go.Figure(go.Treemap(
+        ids=[node[0] for node in nodes], parents=[node[1] for node in nodes],
+        labels=[node[2] for node in nodes], values=[node[4] for node in nodes],
+        branchvalues="total", maxdepth=2, root_color="white",
+        marker=dict(colors=rates, coloraxis="coloraxis", line=dict(color="white", width=2)),
+        tiling=dict(pad=6), pathbar=dict(visible=True, thickness=28),
+        customdata=[[fmt_n(n), fmt_n(churners), fmt_pct(churners / n)]
+                    for _, _, _, n, churners in nodes],
+        texttemplate="<b>%{label}</b><br>%{customdata[1]}",
+        textfont=dict(size=16), textposition="middle center",
+        hovertemplate=("<b>%{label}</b><br>Số khách: %{customdata[0]}"
+                       "<br>Khách rời bỏ: %{customdata[1]}<br>Tỷ lệ rời bỏ: %{customdata[2]}<extra></extra>"),
+    ))
+    fig.update_layout(uniformtext=dict(minsize=14, mode="hide"),
+                      coloraxis=dict(colorscale="Reds", colorbar=dict(
+                          tickformat=".0%", title="Tỷ lệ<br>rời bỏ", thickness=16, len=0.85)))
     lead = churned.Region.value_counts()
     lead = lead[lead.index != "Unknown"]
     share = lead.iloc[0] / len(churned) if len(lead) else 0
-    return apply_style(fig, f"{lead.index[0]} mất nhiều khách nhất về số lượng ({fmt_pct(share)} tổng khách rời bỏ)",
-                       f"Diện tích = số khách rời bỏ, màu = tỷ lệ rời bỏ · {top} vùng lớn nhất", height=460)
+    title = (f"{lead.index[0]} mất nhiều khách nhất về số lượng ({fmt_pct(share)} tổng khách rời bỏ)"
+             if len(lead) else "Khách rời bỏ chưa xác định vùng phục vụ")
+    return apply_style(fig, title,
+                       "Diện tích = số khách rời bỏ · Màu = tỷ lệ rời bỏ · Bấm vào vùng để xem thời gian sử dụng",
+                       height=600)
 
 
 def region_pareto(df: pd.DataFrame) -> go.Figure:
