@@ -518,7 +518,7 @@ def overage_bubble(df: pd.DataFrame) -> go.Figure:
     for band in [b for b in palette if b in set(table.OverageBand.astype(str))]:
         part = table[table.OverageBand.astype(str) == band]
         fig.add_trace(go.Scatter(
-            x=part.MinutesBand.astype(str), y=part.rate, mode="markers", name=f"Vượt gói {band} phút",
+            x=part.MinutesBand.astype(str), y=part.rate, mode="markers", name=band,
             marker=dict(size=part.n, sizemode="area", sizeref=2 * table.n.max() / 60 ** 2, sizemin=6,
                         color=palette[band], line=dict(color="white", width=1)),
             customdata=_hover(part), hovertemplate=HOVER.replace("%{x}", f"%{{x}} · vượt {band}")))
@@ -531,7 +531,16 @@ def overage_bubble(df: pd.DataFrame) -> go.Figure:
     title = "Gói cước và tỷ lệ rời bỏ: dùng ít và vượt gói nhiều đều rủi ro"
     if len(top):
         title = f"Vượt gói > 200 phút có tỷ lệ rời bỏ {fmt_pct(top.rate.iloc[0])}; dùng ít (≤150 phút) cũng rủi ro"
-    return apply_style(fig, title, "Kích thước bong bóng = số khách", height=400)
+    fig = apply_style(fig, title.replace("; ", "<br>"), "Kích thước bong bóng = số khách", height=500)
+    fig.update_layout(
+        margin=dict(t=115, b=125),
+        legend=dict(
+            title=dict(text="Số phút vượt gói", side="top"), orientation="h",
+            x=0.5, xanchor="center", y=-0.30, yanchor="top",
+            font=dict(size=12), itemsizing="constant", bgcolor="white",
+        ),
+    )
+    return fig
 
 
 # ---------- C13–C15: địa lý ----------
