@@ -2,7 +2,7 @@
 
 Đọc **`docs/PLAN_TRUC_QUAN_HOA.md` trước khi làm bất cứ việc gì**. Đó là plan đã duyệt.
 
-Task hiện tại theo yêu cầu người dùng: khôi phục mô hình về đúng 10 biến đầu vào, chạy lại notebook 03 và đồng bộ kết quả notebook 04, dashboard, tài liệu. EDA giữ các cột mô tả bổ sung; C18 dùng 10 predictor và nhãn rời bỏ. Các mốc 52 biến trong tài liệu T9/T10 là lịch sử, không phải cấu hình đang dùng.
+Task hiện tại theo yêu cầu người dùng: mô hình và toàn bộ EDA chỉ dùng đúng 10 predictor đã chọn, nhãn rời bỏ và các đại lượng suy ra từ chúng. Bỏ chiều ngoài phạm vi khỏi từng biểu đồ; giữ biến hợp lệ và loại biểu đồ, không tự thêm biến thay thế. Biểu đồ hết biến phân nhóm giữ vị trí thông báo. Quy tắc phân khúc cũng không được dựa vào cột ngoài bộ 10. Các mốc 52 biến trong tài liệu T9/T10 là lịch sử.
 
 ## Mục tiêu
 Đồ án môn **Trực quan hóa dữ liệu**: xử lý dữ liệu cơ bản → nhiều biểu đồ đa dạng → insight có số →

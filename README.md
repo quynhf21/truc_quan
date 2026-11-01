@@ -1,7 +1,7 @@
 # Cell2Cell — Phân tích & trực quan hóa churn khách hàng viễn thông
 
 Đồ án môn **Trực quan hóa dữ liệu**. Vai trò là chuyên viên phân tích dữ liệu của công ty viễn thông Cell2Cell: tìm khách có khả năng
-rời bỏ, giải thích tín hiệu đi kèm và đề xuất chính sách giữ chân. Nguồn gồm 51.047 khách × 58 cột; mô hình chỉ chọn đúng 10 biến đầu vào. EDA giữ các cột mô tả bổ sung.
+rời bỏ, giải thích tín hiệu đi kèm và đề xuất chính sách giữ chân. Nguồn gồm 51.047 khách × 58 cột; mô hình và EDA chỉ chọn đúng 10 biến đầu vào, cùng nhãn rời bỏ và các đại lượng suy ra từ chúng.
 
 ## Sản phẩm
 
@@ -40,7 +40,7 @@ Notebook 04 tự chuẩn bị dữ liệu khi chạy từ đầu: nguồn 51.047
 
 ```
 data/cell2celltrain.csv            nguồn raw (không sửa)
-work/viz/prepare_viz_data.py       làm sạch, band, Region, ActionSegment, ghép điểm rủi ro
+work/viz/prepare_viz_data.py       chọn 10 biến, làm sạch, tạo band/phân khúc, ghép điểm rủi ro
 work/viz/charts.py                 bảng màu + các hàm vẽ Plotly dùng chung cho notebook và dashboard
 work/viz/04_eda_truc_quan.ipynb    EDA trực quan, insight, phân khúc, chính sách
 work/dashboard/dashboard.py        dashboard: Tổng quan · Thiết bị và dịch vụ · Hồ sơ và rủi ro · Phân khúc
@@ -56,10 +56,10 @@ docs/PLAN_TRUC_QUAN_HOA.md         plan làm lại theo hướng trực quan hó
 1. Tỷ lệ rời bỏ **28,8%** sau xử lý; doanh thu tháng của nhóm rời bỏ là $847,7 nghìn.
 2. **Đỉnh hết hợp đồng:** churn vọt từ ~15% (tháng 7–9) lên **44,6% ở tháng 11**.
 3. Máy > 2 năm churn 36,1% (gấp 1,6 lần máy mới); máy không hỗ trợ web 37,4%.
-4. Nhóm đã nhận ưu đãi giữ chân có tỷ lệ rời bỏ 41,2%; cần kiểm tra bằng thử nghiệm đối chứng để kết luận hiệu quả.
-5. Khách im lặng (không gọi CSKH, ít dùng) churn cao hơn khách hay phàn nàn.
-6. Chênh lệch 12 điểm % giữa các vùng; 20/53 vùng chiếm 80% churner.
-7. Theo điểm mô hình 10 biến, các phân khúc ưu tiên gồm 24.669 khách; doanh thu ước tính có rủi ro là $518,4 nghìn/tháng.
+4. C12 chỉ còn nhóm phút gọi; C14 chỉ còn nhóm thời gian sử dụng. Giữ bubble và treemap, bỏ các chiều ngoài bộ 10.
+5. Phân khúc chỉ còn Hết hợp đồng, Máy cũ, Rủi ro cao theo mô hình và Ổn định; số liệu hiện hành nằm trong báo cáo insight.
+
+C08, C10, C11, C13, C15 và C17 giữ vị trí thông báo vì không còn biến phân nhóm thuộc bộ 10. Các biểu đồ còn lại giữ biến hợp lệ; C04 bỏ phút vượt gói, C09 bỏ máy tân trang. Không thêm biến thay thế.
 
 Mô hình hiện hành `cell2cell-catboost-oof-10-v1`: ROC-AUC ngoài mẫu **0,6725**, AP **0,4549**, lift top 10% toàn nguồn **1,88×**. Kết quả được chạy lại từ notebook 03; notebook 04 tự tính nhận xét, cập nhật C19/C20, bảng phân khúc và xuất báo cáo [`INSIGHTS_AND_POLICY.md`](INSIGHTS_AND_POLICY.md).
 
@@ -149,7 +149,7 @@ Raw không bị sửa. Ba notebook tạo các artifact tái lập trong `work/bu
 | `model_metrics.json` | Depth được chọn trong inner train, metric ngoài mẫu, lift@capacity |
 | `policy_matrix.csv` | Điều kiện, treatment giả thuyết, KPI và guardrail |
 
-`CustomerID` chỉ dùng để đối soát, không là predictor. Mô hình `cell2cell-catboost-oof-10-v1` chỉ dùng 10 biến trong [project_contract.md](project_contract.md) mục 5. Notebook 03 không ghép thêm biến từ CSV nguồn. CatBoost xử lý missing ở numeric và categorical unknown; không loại dòng theo complete-case của toàn bộ CSV. EDA có thể khảo sát các cột khác, còn C18 chỉ dùng 10 predictor và nhãn rời bỏ.
+`CustomerID` chỉ dùng để đối soát, không là predictor. Mô hình `cell2cell-catboost-oof-10-v1` chỉ dùng 10 biến trong [project_contract.md](project_contract.md) mục 5. Notebook 03 không ghép thêm biến từ CSV nguồn. CatBoost xử lý missing ở numeric và categorical unknown; không loại dòng theo complete-case của toàn bộ CSV. EDA cũng chỉ dùng bộ 10 predictor và các đại lượng suy ra; C18 thêm nhãn rời bỏ để đối chiếu tương quan.
 
 #### Mẫu số và benchmark
 

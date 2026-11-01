@@ -13,18 +13,13 @@ BUILD = ROOT / "work" / "build"
 MART = BUILD / "customer_mart.parquet"
 OUT = BUILD / "viz_customers.parquet"
 
-NUMERIC = [
-    "MonthlyRevenue", "MonthlyMinutes", "TotalRecurringCharge", "DirectorAssistedCalls", "OverageMinutes",
-    "RoamingCalls", "PercChangeMinutes", "PercChangeRevenues", "DroppedBlockedCalls", "UnansweredCalls",
-    "CustomerCareCalls", "ThreewayCalls", "ReceivedCalls", "OutboundCalls", "InboundCalls", "PeakCallsInOut",
-    "OffPeakCallsInOut", "CallWaitingCalls", "MonthsInService", "UniqueSubs", "ActiveSubs", "Handsets",
-    "HandsetModels", "CurrentEquipmentDays", "AgeHH1", "RetentionCalls", "RetentionOffersAccepted",
-    "ReferralsMadeBySubscriber", "AdjustmentsToCreditRating",
+FEATURES = [
+    "MonthsInService", "CurrentEquipmentDays", "HandsetWebCapable",
+    "MonthlyRevenue", "TotalRecurringCharge", "CreditRating",
+    "MonthlyMinutes", "PercChangeMinutes", "PercChangeRevenues", "PeakCallsInOut",
 ]
-CATEGORICAL = [
-    "ServiceArea", "HandsetWebCapable", "HandsetRefurbished", "HandsetPrice", "MadeCallToRetentionTeam",
-    "CreditRating", "IncomeGroup", "PrizmCode", "Occupation", "MaritalStatus",
-]
+CATEGORICAL = ["HandsetWebCapable", "CreditRating"]
+NUMERIC = [column for column in FEATURES if column not in CATEGORICAL]
 
 # Các mức thay đổi có thể âm hợp lệ; các đại lượng còn lại không được âm.
 SIGNED_COLUMNS = {"PercChangeMinutes", "PercChangeRevenues"}
@@ -43,9 +38,6 @@ BANDS = {
                    ["0–6 tháng", "7–12 tháng", "13–18 tháng", "19–24 tháng", "25–36 tháng", ">36 tháng"]),
     "EquipmentAgeBand": ("CurrentEquipmentDays", [-0.1, 180, 365, 730, np.inf],
                          ["≤180 ngày", "181–365 ngày", "366–730 ngày", ">730 ngày"]),
-    "CareCallsBand": ("CustomerCareCalls", [-0.1, 0, 1, 3, 10, np.inf], ["0", "≤1", "1–3", "3–10", ">10"]),
-    "DroppedBand": ("DroppedBlockedCalls", [-0.1, 0, 5, 15, 40, np.inf], ["0", "≤5", "5–15", "15–40", ">40"]),
-    "OverageBand": ("OverageMinutes", [-0.1, 0, 50, 200, np.inf], ["0", "≤50", "50–200", ">200"]),
     "MinutesBand": ("MonthlyMinutes", [-0.1, 150, 500, np.inf], ["≤150 phút", "150–500 phút", ">500 phút"]),
 }
 
@@ -59,21 +51,20 @@ def add_bands(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-SEGMENTS = ["Đã báo động", "Hết hợp đồng", "Máy cũ", "Rủi ro cao (mô hình)", "Ổn định"]
+SEGMENTS = ["Hết hợp đồng", "Máy cũ", "Rủi ro cao (mô hình)", "Ổn định"]
 
 
 def add_segment(df: pd.DataFrame) -> pd.DataFrame:
     # Rule có thứ tự ưu tiên: điều kiện đầu tiên khớp sẽ quyết định segment.
     # Tháng 10–13 bao quanh đỉnh churn tháng 11–12 (hết hợp đồng 1 năm).
     conditions = [
-        df.MadeCallToRetentionTeam.eq("Yes"),
         df.MonthsInService.between(10, 13),
         df.CurrentEquipmentDays.gt(730) | (df.CurrentEquipmentDays.ge(365) & df.HandsetWebCapable.eq("No")),
     ]
-    labels = SEGMENTS[:3]
+    labels = SEGMENTS[:2]
     if "RiskDecile" in df:
         conditions.append(df.RiskDecile.ge(8))
-        labels.append(SEGMENTS[3])
+        labels.append(SEGMENTS[2])
     segment = np.select(conditions, labels, default=SEGMENTS[-1])
     df["ActionSegment"] = pd.Categorical(segment, categories=[*labels, SEGMENTS[-1]], ordered=True)
     return df
@@ -83,14 +74,12 @@ def prepare_data(raw: pd.DataFrame) -> pd.DataFrame:
     """Chuẩn hóa bảng đã kiểm tra; không đọc lại dữ liệu nguồn hoặc huấn luyện mô hình."""
     if raw[NON_NEGATIVE_COLUMNS].lt(0).any().any():
         raise ValueError("Dữ liệu còn số âm bất thường. Hãy chạy remove_invalid_negative_rows trước.")
-    df = raw[["CustomerID", "Churn", *NUMERIC, *CATEGORICAL]].copy()
+    df = raw[["CustomerID", "Churn", *FEATURES]].copy()
     if not df.Churn.isin(["Yes", "No"]).all():
         raise SystemExit("Cột Churn có giá trị khác Yes/No.")
     df["ChurnFlag"] = df.Churn.eq("Yes").astype(int)
     for col in CATEGORICAL:
         df[col] = df[col].fillna("Unknown").astype(str)
-    df["Region"] = df.ServiceArea.where(df.ServiceArea.ne("Unknown"), None).str[:3].fillna("Unknown")
-    df["RetentionOfferAccepted"] = np.where(df.RetentionOffersAccepted.gt(0), "Yes", "No")
     df = add_bands(df)
 
     if MART.exists():

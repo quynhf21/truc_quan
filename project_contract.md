@@ -57,7 +57,7 @@ Tập 49.752 của tài liệu hiện tại là complete-case trên **toàn bộ
 
 Mô hình chính `cell2cell-catboost-oof-10-v1` chỉ dùng đúng 10 biến: `MonthsInService`, `CurrentEquipmentDays`, `HandsetWebCapable`, `MonthlyRevenue`, `TotalRecurringCharge`, `CreditRating`, `MonthlyMinutes`, `PercChangeMinutes`, `PercChangeRevenues`, `PeakCallsInOut`. Notebook 03 lấy trực tiếp bộ 10 biến đã được notebook 01 chuẩn hóa, không ghép thêm predictor từ CSV nguồn. Kết quả hiện hành được tính lại trong `work/build/model_metrics.json`; không dùng AUC của cấu hình trước để thay thế kết quả chạy.
 
-EDA được phép khảo sát các cột nguồn khác để giải thích hành vi và đề xuất chính sách; những cột đó không tự trở thành đầu vào mô hình. C18 chỉ biểu diễn bộ 10 biến trên cùng nhãn rời bỏ. CSV nguồn vẫn giữ nguyên cấu trúc gốc.
+EDA cũng chỉ dùng bộ 10 predictor này, nhãn rời bỏ và các đại lượng suy ra từ chúng. Mã khách chỉ phục vụ đối soát và ghép điểm. Khi bỏ một chiều ngoài phạm vi, giữ nguyên các chiều hợp lệ và loại biểu đồ; không thay bằng predictor mới. Nếu toàn bộ biến phân nhóm đều ngoài phạm vi, giữ vị trí biểu đồ với thông báo. CSV nguồn vẫn giữ nguyên cấu trúc gốc.
 
 `CustomerID` chỉ dùng để ghép kết quả. Các trường retention contact/offer và `ServiceArea` không vào mô hình. Missing được xử lý trong pipeline huấn luyện, học quy tắc từ train fold và áp dụng cho validation/holdout; báo số khách không thể chấm điểm nếu còn. Risk score, decile và lift để trình bày phải dựa trên dự đoán cho dòng chưa dùng fit model. Tối thiểu báo ROC-AUC, PR-AUC, log loss, calibration và lift@5/10/20%.
 

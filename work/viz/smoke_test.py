@@ -30,7 +30,7 @@ if __name__ == "__main__":
         title = build(df).layout.title.text.split("<br>")[0]
         print(key, "|", title.replace("<b>", "").replace("</b>", ""))
     # Dashboard tự chặn lát cắt rỗng; ở đây thử các lát cắt nhỏ/lệch mà bộ lọc có thể tạo ra.
-    slices = {"STL": df[df.Region == "STL"], "50 dòng": df.head(50),
+    slices = {"không web": df[df.HandsetWebCapable == "No"], "50 dòng": df.head(50),
               "chỉ churner": df[df.ChurnFlag == 1].head(300), "chỉ khách ở lại": df[df.ChurnFlag == 0].head(300),
               "1 khách": df.head(1)}
     ok = all([check(part, name) for name, part in slices.items()])

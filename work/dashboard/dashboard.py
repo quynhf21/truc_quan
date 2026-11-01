@@ -27,7 +27,6 @@ UPDATED_AT = datetime.fromtimestamp(DATA_PATH.stat().st_mtime).strftime("%d/%m/%
 
 FILTERS = [
     ("tenure", "Thời gian sử dụng", "TenureBand"),
-    ("region", "Vùng", "Region"),
     ("equipment", "Tuổi thiết bị", "EquipmentAgeBand"),
     ("credit", "Hạng tín dụng", "CreditRating"),
 ]
@@ -43,15 +42,15 @@ CHART_TITLES = {
     "C05b_so_khach": "Số khách rời bỏ và ở lại theo tháng sử dụng",
     "C06_tuoi_thiet_bi": "Tỷ lệ rời bỏ theo tuổi thiết bị",
     "C07_heatmap_tenure_thiet_bi": "Tỷ lệ rời bỏ theo thời gian sử dụng và tuổi thiết bị",
-    "C08_retention_funnel": "Liên hệ và ưu đãi giữ chân",
+    "C08_retention_funnel": "C08 · Không còn biến trong phạm vi mô hình",
     "C09_dac_diem_thiet_bi": "Tỷ lệ rời bỏ theo đặc điểm thiết bị",
-    "C10_goi_cskh": "Tỷ lệ rời bỏ theo cuộc gọi chăm sóc khách hàng",
-    "C11_cuoc_goi_rot": "Tỷ lệ rời bỏ theo cuộc gọi rớt hoặc bị chặn",
-    "C12_goi_cuoc": "Tỷ lệ rời bỏ theo mức sử dụng và phút vượt gói",
-    "C13_vung": "Tỷ lệ rời bỏ theo vùng",
-    "C14_treemap_vung": "Số khách rời bỏ theo vùng và thời gian sử dụng",
+    "C10_goi_cskh": "C10 · Không còn biến trong phạm vi mô hình",
+    "C11_cuoc_goi_rot": "C11 · Không còn biến trong phạm vi mô hình",
+    "C12_goi_cuoc": "Tỷ lệ rời bỏ theo mức sử dụng",
+    "C13_vung": "C13 · Không còn biến trong phạm vi mô hình",
+    "C14_treemap_vung": "Số khách rời bỏ theo thời gian sử dụng",
     "C16_tin_dung": "Tỷ lệ rời bỏ theo hạng tín dụng",
-    "C17_nhan_khau_hoc": "Tỷ lệ rời bỏ theo đặc điểm khách hàng",
+    "C17_nhan_khau_hoc": "C17 · Không còn biến trong phạm vi mô hình",
     "C19a_risk_decile": "Tỷ lệ rời bỏ theo nhóm rủi ro",
     "C19b_gain_curve": "Tỷ lệ khách rời bỏ được xác định theo phạm vi liên hệ",
     "C20_phan_khuc": "Tỷ lệ rời bỏ và doanh thu theo phân khúc",
@@ -152,8 +151,7 @@ def page_drivers(data):
         rate_kpi("Tỷ lệ rời bỏ · thiết bị trên 2 năm", data[data.EquipmentAgeBand == ">730 ngày"]),
         rate_kpi("Tỷ lệ rời bỏ · thiết bị không hỗ trợ mạng", data[data.HandsetWebCapable == "No"]),
         rate_kpi("Tỷ lệ rời bỏ · tháng sử dụng 11–12", data[data.MonthsInService.between(11, 12)]),
-        rate_kpi("Tỷ lệ rời bỏ · không gọi chăm sóc khách hàng", data[data.CustomerCareCalls == 0]),
-    ], className="kpi-grid")
+    ], className="kpi-grid three")
     keys = ["C06_tuoi_thiet_bi", "C07_heatmap_tenure_thiet_bi", "C09_dac_diem_thiet_bi",
             "C10_goi_cskh", "C11_cuoc_goi_rot", "C12_goi_cuoc"]
     return [cards, html.Div([graph(key, data) for key in keys], className="grid")]
@@ -161,7 +159,6 @@ def page_drivers(data):
 
 def page_risk(data):
     cards = [
-        rate_kpi("Tỷ lệ rời bỏ · đã liên hệ giữ chân", data[data.MadeCallToRetentionTeam == "Yes"]),
         rate_kpi("Tỷ lệ rời bỏ · tín dụng hạng 1–3", data[data.CreditRating.isin(c.CREDIT_ORDER[:3])]),
     ]
     if HAS_RISK:

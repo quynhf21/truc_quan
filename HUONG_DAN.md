@@ -46,7 +46,7 @@ So sánh CatBoost, Logistic và LightGBM trên cùng 10 biến: `python work/exp
 ## 3. Dùng dashboard
 
 - **Thanh bên trái:** Tổng quan → Thiết bị và dịch vụ → Hồ sơ và rủi ro → Phân khúc khách hàng.
-- **Bộ lọc trên cùng:** Thời gian sử dụng, Vùng, Tuổi thiết bị, Hạng tín dụng. Được chọn nhiều giá trị; để trống nghĩa là "Tất cả".
+- **Bộ lọc trên cùng:** Thời gian sử dụng, Tuổi thiết bị, Hạng tín dụng. Được chọn nhiều giá trị; để trống nghĩa là "Tất cả". Bộ lọc vùng đã bỏ vì không thuộc 10 biến.
   Chỉ số và biểu đồ cập nhật theo lát cắt từ bản dữ liệu do notebook xuất. **Xóa lọc** đưa về toàn bộ khách và biểu đồ đã lưu.
 - **KPI:** ▲ đỏ = xấu hơn toàn công ty, ▼ xanh = tốt hơn.
 - **Biểu đồ:** rê chuột để xem số khách, số khách rời bỏ và tỷ lệ rời bỏ. Nút máy ảnh góc phải để tải PNG. Dashboard hiển thị tiêu đề trung tính; nhận xét và chính sách nằm trong notebook.
