@@ -55,7 +55,9 @@ Tập 49.752 của tài liệu hiện tại là complete-case trên **toàn bộ
 
 ## 5. Phạm vi feature và mô hình
 
-Mô hình chính (v2, đổi ngày 31/10/2026) nhận mọi cột của raw CSV trừ `CustomerID`, `Churn`, `ServiceArea` và 3 trường retention: 52 cột. Lý do: so sánh trong `work/experiments/compare_models.py` cho AUC 0,672 → 0,681. Notebook 01 vẫn chuẩn hóa 10 base feature (`MonthsInService`, `CurrentEquipmentDays`, `HandsetWebCapable`, `MonthlyRevenue`, `TotalRecurringCharge`, `CreditRating`, `MonthlyMinutes`, `PercChangeMinutes`, `PercChangeRevenues`, `PeakCallsInOut`); notebook 03 ghép thêm các cột còn lại từ raw CSV đã xác nhận SHA256.
+Mô hình chính `cell2cell-catboost-oof-10-v1` chỉ dùng đúng 10 biến: `MonthsInService`, `CurrentEquipmentDays`, `HandsetWebCapable`, `MonthlyRevenue`, `TotalRecurringCharge`, `CreditRating`, `MonthlyMinutes`, `PercChangeMinutes`, `PercChangeRevenues`, `PeakCallsInOut`. Notebook 03 lấy trực tiếp bộ 10 biến đã được notebook 01 chuẩn hóa, không ghép thêm predictor từ CSV nguồn. Kết quả hiện hành được tính lại trong `work/build/model_metrics.json`; không dùng AUC của cấu hình trước để thay thế kết quả chạy.
+
+EDA được phép khảo sát các cột nguồn khác để giải thích hành vi và đề xuất chính sách; những cột đó không tự trở thành đầu vào mô hình. C18 chỉ biểu diễn bộ 10 biến trên cùng nhãn rời bỏ. CSV nguồn vẫn giữ nguyên cấu trúc gốc.
 
 `CustomerID` chỉ dùng để ghép kết quả. Các trường retention contact/offer và `ServiceArea` không vào mô hình. Missing được xử lý trong pipeline huấn luyện, học quy tắc từ train fold và áp dụng cho validation/holdout; báo số khách không thể chấm điểm nếu còn. Risk score, decile và lift để trình bày phải dựa trên dự đoán cho dòng chưa dùng fit model. Tối thiểu báo ROC-AUC, PR-AUC, log loss, calibration và lift@5/10/20%.
 

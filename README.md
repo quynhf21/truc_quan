@@ -1,13 +1,13 @@
 # Cell2Cell — Phân tích & trực quan hóa churn khách hàng viễn thông
 
 Đồ án môn **Trực quan hóa dữ liệu**. Vai trò là chuyên viên phân tích dữ liệu của công ty viễn thông Cell2Cell: tìm khách có khả năng
-rời bỏ, giải thích tín hiệu đi kèm và đề xuất chính sách giữ chân. Dữ liệu gồm 51.047 khách × 58 cột, churn 28,8%.
+rời bỏ, giải thích tín hiệu đi kèm và đề xuất chính sách giữ chân. Nguồn gồm 51.047 khách × 58 cột; mô hình chỉ chọn đúng 10 biến đầu vào. EDA giữ các cột mô tả bổ sung.
 
 ## Sản phẩm
 
 | Sản phẩm | File |
 |---|---|
-| Notebook phân tích + 22 biểu đồ + nhận xét | [`work/viz/04_eda_truc_quan.ipynb`](work/viz/04_eda_truc_quan.ipynb) |
+| Notebook phân tích, biểu đồ và nhận xét | [`work/viz/04_eda_truc_quan.ipynb`](work/viz/04_eda_truc_quan.ipynb) |
 | Dashboard BI 4 trang (Dash) | [`work/dashboard/dashboard.py`](work/dashboard/dashboard.py) · ảnh: [`reports/dashboard/`](reports/dashboard/) |
 | Insight & chính sách giữ chân | [`INSIGHTS_AND_POLICY.md`](INSIGHTS_AND_POLICY.md) |
 | Hướng dẫn chạy, dùng dashboard, chỉnh sửa | [`HUONG_DAN.md`](HUONG_DAN.md) |
@@ -22,13 +22,13 @@ Python 3.11. Trên Windows/PowerShell:
 ```powershell
 python -m venv .venv; .\.venv\Scripts\Activate.ps1
 python -m pip install -r work/requirements.txt
-python work/pipeline/run_all.py          # (tùy chọn, vài phút) tạo điểm rủi ro CatBoost cho trang 3–4
+python work/pipeline/run_all.py          # tạo điểm rủi ro CatBoost dùng đúng 10 biến
 python work/viz/prepare_viz_data.py      # tạo work/build/viz_customers.parquet
-jupyter nbconvert --to notebook --execute --inplace work/viz/04_eda_truc_quan.ipynb   # hoặc mở và Run All
+python work/pipeline/run_all.py --only 04 --cwd project  # hoặc mở notebook 04 và Run All
 python work/dashboard/dashboard.py       # mở http://127.0.0.1:8050/
 ```
 
-Không chạy `run_all.py` thì dashboard vẫn chạy, chỉ ẩn phần điểm rủi ro và nhóm "Rủi ro cao (mô hình)".
+Nếu đã có dữ liệu processed từ notebook 01, dùng `python work/pipeline/run_all.py --only 03 --cwd project` để chạy lại riêng mô hình, rồi chạy notebook 04. Bản hiện tại yêu cầu điểm 10 biến để đồng bộ phần rủi ro và phân khúc.
 Xuất PNG (`fig.write_image`) dùng `kaleido` 1.x, cần Chrome/Edge trên máy; nếu thiếu thì chạy `kaleido_get_chrome` một lần.
 Kiểm tra nhanh mọi hàm vẽ: `python work/viz/smoke_test.py`.
 
@@ -41,7 +41,7 @@ Notebook 04 tự chuẩn bị dữ liệu khi chạy từ đầu: nguồn 51.047
 ```
 data/cell2celltrain.csv            nguồn raw (không sửa)
 work/viz/prepare_viz_data.py       làm sạch, band, Region, ActionSegment, ghép điểm rủi ro
-work/viz/charts.py                 bảng màu + 22 biểu đồ Plotly dùng chung cho notebook và dashboard
+work/viz/charts.py                 bảng màu + các hàm vẽ Plotly dùng chung cho notebook và dashboard
 work/viz/04_eda_truc_quan.ipynb    EDA trực quan, insight, phân khúc, chính sách
 work/dashboard/dashboard.py        dashboard: Tổng quan · Thiết bị và dịch vụ · Hồ sơ và rủi ro · Phân khúc
 work/build/dashboard/              bộ kết quả notebook: dữ liệu và biểu đồ Plotly (tạo khi chạy, không đưa vào Git)
@@ -59,7 +59,9 @@ docs/PLAN_TRUC_QUAN_HOA.md         plan làm lại theo hướng trực quan hó
 4. Nhóm đã nhận ưu đãi giữ chân có tỷ lệ rời bỏ 41,2%; cần kiểm tra bằng thử nghiệm đối chứng để kết luận hiệu quả.
 5. Khách im lặng (không gọi CSKH, ít dùng) churn cao hơn khách hay phàn nàn.
 6. Chênh lệch 12 điểm % giữa các vùng; 20/53 vùng chiếm 80% churner.
-7. Các phân khúc ưu tiên gồm 25.274 khách; doanh thu ước tính có rủi ro là $534,1 nghìn/tháng.
+7. Theo điểm mô hình 10 biến, các phân khúc ưu tiên gồm 24.669 khách; doanh thu ước tính có rủi ro là $518,4 nghìn/tháng.
+
+Mô hình hiện hành `cell2cell-catboost-oof-10-v1`: ROC-AUC ngoài mẫu **0,6725**, AP **0,4549**, lift top 10% toàn nguồn **1,88×**. Kết quả được chạy lại từ notebook 03; notebook 04 tự tính nhận xét, cập nhật C19/C20, bảng phân khúc và xuất báo cáo [`INSIGHTS_AND_POLICY.md`](INSIGHTS_AND_POLICY.md).
 
 ---
 
@@ -147,7 +149,7 @@ Raw không bị sửa. Ba notebook tạo các artifact tái lập trong `work/bu
 | `model_metrics.json` | Depth được chọn trong inner train, metric ngoài mẫu, lift@capacity |
 | `policy_matrix.csv` | Điều kiện, treatment giả thuyết, KPI và guardrail |
 
-`CustomerID` chỉ dùng để đối soát, không là predictor. Mô hình v2 dùng 52 cột nguồn (trừ ID, target, `ServiceArea` và 3 trường retention) theo [project_contract.md](project_contract.md) mục 5. CatBoost xử lý missing ở numeric và categorical unknown; không loại 1.295 dòng để lấy complete-case toàn bộ 58 cột. Các giá trị âm bất thường được ghi trong QA và giữ nguyên ở bảng nguồn; band biểu đồ gắn nhãn `Giá trị âm` khi thích hợp.
+`CustomerID` chỉ dùng để đối soát, không là predictor. Mô hình `cell2cell-catboost-oof-10-v1` chỉ dùng 10 biến trong [project_contract.md](project_contract.md) mục 5. Notebook 03 không ghép thêm biến từ CSV nguồn. CatBoost xử lý missing ở numeric và categorical unknown; không loại dòng theo complete-case của toàn bộ CSV. EDA có thể khảo sát các cột khác, còn C18 chỉ dùng 10 predictor và nhãn rời bỏ.
 
 #### Mẫu số và benchmark
 

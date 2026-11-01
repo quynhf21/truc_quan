@@ -53,7 +53,7 @@ def run_notebook(path: Path, working_directory: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--only", choices=["01", "02", "03"])
+    parser.add_argument("--only", choices=["01", "02", "03", "04"])
     parser.add_argument("--cwd", choices=["project", "notebook"], default="notebook")
     args = parser.parse_args()
     runtime_dir = PROJECT_ROOT / "work" / "build" / "jupyter_runtime"
@@ -62,11 +62,13 @@ def main() -> None:
     os.environ["JUPYTER_RUNTIME_DIR"] = str(runtime_dir)
     os.environ["MPLCONFIGDIR"] = str(runtime_dir / "matplotlib")
     selected = [p for p in NOTEBOOKS if args.only is None or p.name.startswith(args.only)]
+    if args.only == "04":
+        selected = [PROJECT_ROOT / "work" / "viz" / "04_eda_truc_quan.ipynb"]
     missing = [str(path) for path in selected if not path.is_file()]
     if missing:
         raise FileNotFoundError(f"Missing pipeline notebooks: {missing}")
-    working_directory = PROJECT_ROOT if args.cwd == "project" else PIPELINE_DIR
     for notebook in selected:
+        working_directory = PROJECT_ROOT if args.cwd == "project" else notebook.parent
         run_notebook(notebook, working_directory)
     print("PIPELINE PASS — selected notebooks completed", flush=True)
 

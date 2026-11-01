@@ -7,13 +7,13 @@ Bản hướng dẫn cũ (thiên về mô hình) vẫn còn trong lịch sử gi
 ## 0. Mở đầu (30 giây)
 
 > "Em đóng vai chuyên viên phân tích dữ liệu của Cell2Cell. Câu hỏi ban giám đốc đặt ra: khách nào sắp rời bỏ, vì sao, và nên giữ họ bằng cách nào.
-> Dữ liệu gồm 51.047 khách, 58 cột."
+> Dữ liệu nguồn gồm 51.047 khách, 58 cột; mô hình chỉ chọn 10 biến đầu vào. EDA có thể khảo sát thêm cột để giải thích hành vi."
 
 ## 1. Xử lý dữ liệu (1 phút) — notebook mục 2–3
 
-- Dữ liệu khá sạch: missing tối đa 1,78% (C02). Giữ toàn bộ khách, không xóa dòng.
+- Dữ liệu khá sạch: missing tối đa 1,78% trong các cột EDA ở C02. Giá trị thiếu được xử lý theo từng biểu đồ; loại 85 dòng có số âm bất thường, tập EDA còn 50.962 khách.
 - Chuẩn hóa: `NA` → missing, `Churn` → 0/1, `Region` = 3 ký tự đầu mã vùng, chia band (tenure, tuổi máy, cuộc gọi CSKH...).
-- 76 giá trị tuổi máy âm được gắn nhãn "Bất thường", không xóa. Outlier giữ lại vì là khách thật.
+- Loại số âm bất thường ở các đại lượng không thể âm; giữ số âm ở hai trường mức thay đổi. Giá trị dương rất lớn vẫn được giữ, chỉ giới hạn khi vẽ phân bố cho dễ nhìn.
 
 ## 2. Trang Tổng quan (1 phút)
 
@@ -34,12 +34,12 @@ Bản hướng dẫn cũ (thiên về mô hình) vẫn còn trong lịch sử gi
 ## 4. Trang Chân dung & rủi ro (1,5 phút)
 
 - Funnel: khách đã nhận ưu đãi giữ chân **vẫn churn 41%**, tức chương trình hiện tại không giữ được khách.
-- Mô hình (CatBoost 52 cột): decile 10 churn 56%. Gain curve: liên hệ 20% khách rủi ro nhất bắt được 34% khách sẽ rời bỏ.
+- Mô hình CatBoost dùng đúng 10 biến: ROC-AUC ngoài mẫu 0,6725, AP 0,4549. Decile cao nhất có tỷ lệ rời bỏ khoảng 54,2%; chọn 20% khách xếp rủi ro cao nhất tiếp cận khoảng 33,6% khách rời bỏ. Đây là kết quả xếp hạng trên nhãn quan sát, không phải số khách đã được giữ chân.
 - Tín dụng tốt churn cao hơn; nhân khẩu học (thu nhập, nghề, hôn nhân) chênh rất ít, nên **chọn khách theo hành vi, không theo nhân khẩu**.
 
 ## 5. Trang Hành động (1,5 phút)
 
-- Bubble matrix: 4 phân khúc cần can thiệp đều nằm bên phải đường trung bình. Tổng cộng 25.319 khách, ≈ $534 nghìn/tháng bị đe dọa.
+- Bubble matrix giữ nguyên loại biểu đồ và quy tắc phân khúc, cập nhật điểm mô hình 10 biến. Bốn nhóm cần can thiệp gồm 24.669 khách, khoảng $518,4 nghìn/tháng bị đe dọa. Nhóm rủi ro cao theo mô hình có 4.950 khách, tỷ lệ rời bỏ 42,2%.
 - Đọc 4 thẻ chính sách theo thứ tự ưu tiên:
   1. **Đã báo động**: thiết kế lại ưu đãi.
   2. **Hết hợp đồng**: gọi từ tháng 10, ưu đãi gia hạn. Đây là nhóm có doanh thu bị đe dọa lớn nhất.
@@ -60,4 +60,4 @@ Bản hướng dẫn cũ (thiên về mô hình) vẫn còn trong lịch sử gi
 | Đỉnh tháng 11 có chắc là hết hợp đồng? | Là giả thuyết hợp lý nhất (dữ liệu không có cột hợp đồng); cần xác nhận với bộ phận kinh doanh |
 | Doanh thu bị đe dọa tính thế nào? | Tổng `MonthlyRevenue` của nhóm × churn rate của nhóm; là doanh thu, không phải lợi nhuận |
 | Vì sao bỏ nhóm "Sai gói"? | Sau khi tách các nhóm ưu tiên trước, nhóm này churn dưới trung bình (24%) nên không đáng can thiệp riêng |
-| Mô hình tốt cỡ nào? | ROC-AUC ≈ 0,68 (bản 10 cột 0,67; Logistic 0,61; LightGBM ngang): đủ để xếp hạng ưu tiên, chưa đủ để dự đoán từng khách. Trần của bộ dữ liệu khoảng 0,68–0,70 |
+| Mô hình tốt cỡ nào? | Bản hiện tại dùng đúng 10 biến, ROC-AUC 0,6725, AP 0,4549, lift top 10% toàn nguồn 1,88×. Dùng để xếp hạng và đánh giá phạm vi liên hệ; chưa chứng minh hiệu quả chính sách. |

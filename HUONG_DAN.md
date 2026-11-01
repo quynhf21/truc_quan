@@ -20,28 +20,28 @@ python -m pip install -r work/requirements.txt
 
 | Bước | Lệnh | Kết quả | Thời gian |
 |---|---|---|---|
-| 1 (tùy chọn) | `python work/pipeline/run_all.py` | Điểm rủi ro CatBoost 52 cột `work/build/customer_mart.parquet` | 8–15 phút |
+| 1 | `python work/pipeline/run_all.py` | Điểm rủi ro CatBoost 10 biến `work/build/customer_mart.parquet` | vài phút |
 | 2 (tùy chọn) | `python work/viz/prepare_viz_data.py` | Bảng phân tích sau khi loại số âm bất thường | vài giây |
-| 3 | Mở notebook 04 và chạy tất cả các ô; hoặc `jupyter nbconvert --to notebook --execute --inplace work/viz/04_eda_truc_quan.ipynb` | Output, PNG và bộ kết quả dashboard trong `work/build/dashboard/` | vài phút |
+| 3 | Mở notebook 04 và chạy tất cả các ô; hoặc `python work/pipeline/run_all.py --only 04 --cwd project` | Output, PNG, báo cáo insight và bộ kết quả dashboard | vài phút |
 | 4 | `python work/dashboard/dashboard.py` | Dashboard tại http://127.0.0.1:8050/ | — |
 
-- Bỏ qua bước 1 thì dashboard vẫn chạy, chỉ ẩn phần điểm rủi ro, gain curve và nhóm "Rủi ro cao (mô hình)".
+- Khi đã có processed từ notebook 01, chỉ cần `python work/pipeline/run_all.py --only 03 --cwd project` để chạy lại mô hình 10 biến. Sau đó chạy bước 3 để đồng bộ EDA và dashboard; không dùng lại điểm của cấu hình trước.
 - Notebook 04 tự đọc nguồn, kiểm tra, loại số âm bất thường và tạo bảng phân tích; không bắt buộc chạy bước 2 trước.
 - Bước 3 là bắt buộc trước khi mở dashboard. Notebook xuất biểu đồ Plotly và bản dữ liệu cùng lần chạy. Khi cập nhật dữ liệu hoặc biểu đồ, chạy lại bước 2–3 rồi khởi động lại dashboard.
 - `work/build/` bị gitignore: máy mới clone về phải chạy lại từ bước 1 hoặc bước 2.
-- Bước 1 ghi lại output vào notebook 01–03. Nếu không muốn commit thay đổi đó: `git checkout -- work/pipeline/`.
+- Các lệnh thực thi ghi lại output notebook và ảnh; không commit phần output chạy lại. Giữ các thay đổi mã nguồn khi tạo commit.
 
 Nguồn hiện tại có 51.047 khách. Sau khi loại 85 dòng có số âm bất thường, bảng phân tích còn **50.962 khách**, gồm **14.695 khách rời bỏ (28,84%)**. Hai cột mức thay đổi vẫn giữ số âm hợp lệ. Notebook hiển thị bảng trước/sau và số trường hợp âm theo từng trường.
 
 Kiểm tra nhanh sau khi sửa code:
 
 ```powershell
-python work/viz/smoke_test.py             # gọi 21 hàm vẽ trên dữ liệu thật + các lát cắt nhỏ, phải in toàn "OK"
+python work/viz/smoke_test.py             # gọi các hàm vẽ trên dữ liệu thật + các lát cắt nhỏ, phải in toàn "OK"
 python work/pipeline/verify_notebooks.py  # sau bước 1: 3 AUDIT PASS + 14 GUARD PASS
 ```
 
-So sánh mô hình (CatBoost 10/52 cột, Logistic, LightGBM): `python work/experiments/compare_models.py` (4–6 phút,
-`--quick` khoảng 2 phút), kết quả ở `work/build/model_comparison.csv`. Lý do chọn mô hình: [`MODEL_CARD.md`](MODEL_CARD.md).
+So sánh CatBoost, Logistic và LightGBM trên cùng 10 biến: `python work/experiments/compare_models.py`;
+`--quick` chỉ chạy CatBoost. Kết quả ở `work/build/model_comparison.csv`; cấu hình so sánh không thay thế đánh giá chính thức của notebook 03. Chi tiết mô hình: [`MODEL_CARD.md`](MODEL_CARD.md).
 
 ## 3. Dùng dashboard
 
