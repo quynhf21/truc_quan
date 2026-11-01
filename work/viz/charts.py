@@ -574,11 +574,32 @@ CORR_COLUMNS = [
 ]
 
 
-def correlation_heatmap(df: pd.DataFrame, columns=CORR_COLUMNS) -> go.Figure:
-    corr = df[columns].corr()
+C18_FEATURES = [
+    "MonthsInService", "CurrentEquipmentDays", "HandsetWebCapable",
+    "MonthlyRevenue", "TotalRecurringCharge", "CreditRating",
+    "MonthlyMinutes", "PercChangeMinutes", "PercChangeRevenues", "PeakCallsInOut",
+]
+C18_COLUMNS = [TARGET, *C18_FEATURES]
+
+
+def correlation_matrix(df: pd.DataFrame, columns=C18_COLUMNS) -> pd.DataFrame:
+    """Chỉ mã hóa trên bản sao phục vụ C18, không thay đổi đầu vào mô hình."""
+    data = df[columns].copy()
+    if "HandsetWebCapable" in data:
+        data["HandsetWebCapable"] = data.HandsetWebCapable.map({"Yes": 1, "No": 0, 1: 1, 0: 0})
+    if "CreditRating" in data:
+        rating = data.CreditRating.astype("string").str.extract(r"^([1-7])(?:-|$)", expand=False)
+        data["CreditRating"] = pd.to_numeric(rating, errors="coerce")
+    return data.corr()
+
+
+def correlation_heatmap(df: pd.DataFrame, columns=C18_COLUMNS) -> go.Figure:
+    corr = correlation_matrix(df, columns)
     labels = ["<br>".join(wrap(field_label(c), width=20)) for c in columns]
-    fig = go.Figure(go.Heatmap(z=corr.values, x=labels, y=labels, zmin=-1, zmax=1, colorscale="RdBu_r",
-                               text=corr.round(2).values, texttemplate="%{text}", textfont=dict(size=9),
+    text = [[f"{value:.2f}".replace(".", ",") if pd.notna(value) else "" for value in row]
+            for row in corr.values]
+    fig = go.Figure(go.Heatmap(z=corr.values, x=labels, y=labels, zmin=-1, zmax=1, zmid=0, colorscale="RdBu_r",
+                               text=text, texttemplate="%{text}", textfont=dict(size=11),
                                hovertemplate="%{y} × %{x}: %{z:.2f}<extra></extra>"))
     fig.update_yaxes(autorange="reversed")
     fig.update_xaxes(tickangle=-45)
@@ -587,8 +608,8 @@ def correlation_heatmap(df: pd.DataFrame, columns=CORR_COLUMNS) -> go.Figure:
         return empty_figure("Lát cắt chỉ có một trạng thái rời bỏ: không tính được tương quan")
     top = with_target.abs().idxmax()
     r = f"{with_target[top]:.2f}".replace(".", ",")
-    return apply_style(fig, f"Không biến đơn lẻ nào tương quan mạnh với rời bỏ; cao nhất là {field_label(top).lower()} (r = {r})",
-                       "Hệ số Pearson · các biến phút gọi, số cuộc gọi và doanh thu tương quan mạnh với nhau", height=740)
+    return apply_style(fig, f"Tương quan với rời bỏ cao nhất: {field_label(top).lower()} (r = {r})",
+                       f"{len(columns) - 1} biến đầu vào + Rời bỏ · n = {fmt_n(len(df))} khách · hệ số Pearson", height=740)
 
 
 # ---------- C19: mô hình rủi ro ----------
