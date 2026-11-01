@@ -300,6 +300,7 @@ def tenure_stacked(df: pd.DataFrame) -> go.Figure:
     table = rate_by(df.dropna(subset=["MonthsInService"]), "MonthsInService").sort_values("MonthsInService")
     if table.empty:
         return empty_figure()
+    peak = table.loc[table.churners.idxmax()]
     fig = go.Figure()
     for name, counts, color in [
         ("Rời bỏ", table.churners, CHURN),
@@ -314,7 +315,7 @@ def tenure_stacked(df: pd.DataFrame) -> go.Figure:
     fig.update_layout(barmode="stack", bargap=0.16)
     fig.update_xaxes(title="Thời gian sử dụng dịch vụ (tháng)", dtick=6, rangemode="tozero")
     fig.update_yaxes(title="Số khách hàng", rangemode="tozero", separatethousands=True)
-    return apply_style(fig, "Số khách rời bỏ và ở lại theo thời gian sử dụng dịch vụ",
+    return apply_style(fig, f"Tháng {int(peak.MonthsInService)} có nhiều khách rời bỏ nhất: {fmt_n(peak.churners)} khách",
                        f"Mỗi cột là một tháng · {fmt_n(table.n.sum())} khách · toàn bộ thời gian sử dụng", height=460)
 
 
@@ -664,6 +665,66 @@ def segment_bubble(df: pd.DataFrame) -> go.Figure:
     return apply_style(fig, title, "Bong bóng = số khách · phải đường đứt = tỷ lệ rời bỏ trên trung bình", height=440)
 
 
+def segment_revenue_rank(df: pd.DataFrame) -> go.Figure:
+    """Xếp hạng các nhóm cần can thiệp theo quy mô doanh thu bị đe dọa."""
+    table = segment_summary(df)
+    table = table[table.ActionSegment != "Ổn định"].sort_values("revenue_at_risk", ascending=False)
+    if table.empty:
+        return empty_figure("Không có nhóm cần can thiệp trong lát cắt này")
+    labels = [f"{i}. {row.ActionSegment}<br>{fmt_n(row.n)} khách · {fmt_pct(row.rate)} rời bỏ"
+              for i, row in enumerate(table.itertuples(), start=1)]
+    custom = np.column_stack([table.n.map(fmt_n), table.churners.map(fmt_n),
+                              table.rate.map(fmt_pct), table.revenue_at_risk.map(fmt_money)])
+    fig = go.Figure(go.Bar(
+        x=table.revenue_at_risk, y=labels, orientation="h", marker_color=ACCENT,
+        text=table.revenue_at_risk.map(fmt_money), textposition="outside", cliponaxis=False,
+        customdata=custom,
+        hovertemplate="<b>%{y}</b><br>Số khách: %{customdata[0]}<br>Khách rời bỏ: %{customdata[1]}"
+                      "<br>Tỷ lệ rời bỏ: %{customdata[2]}<br>Doanh thu tháng bị đe dọa: %{customdata[3]}<extra></extra>",
+    ))
+    top = table.iloc[0]
+    fig.update_xaxes(title="Doanh thu tháng bị đe dọa ($)", tickformat=",.0f",
+                     range=[0, max(float(table.revenue_at_risk.max()) * 1.35, 1)])
+    fig.update_yaxes(title=None, autorange="reversed", categoryorder="array", categoryarray=labels)
+    return apply_style(
+        fig, f"Ưu tiên theo doanh thu: “{top.ActionSegment}” đứng đầu ({fmt_money(top.revenue_at_risk)}/tháng)",
+        f"Chỉ các nhóm cần can thiệp · n = {fmt_n(table.n.sum())} khách · xếp theo doanh thu, chưa xét chi phí giữ chân",
+        height=max(380, 80 * len(table) + 150),
+    )
+
+
+def segment_rate_rank(df: pd.DataFrame) -> go.Figure:
+    """Biểu đồ chấm có thân nối, xếp hạng tỷ lệ rời bỏ và đối chiếu baseline."""
+    table = segment_summary(df).sort_values("rate", ascending=False)
+    if table.empty:
+        return empty_figure()
+    base = baseline(df)
+    labels = [f"{row.ActionSegment}<br>{fmt_n(row.n)} khách" for row in table.itertuples()]
+    stem_x, stem_y = [], []
+    for label, rate in zip(labels, table.rate):
+        stem_x.extend([0, rate, None])
+        stem_y.extend([label, label, None])
+    fig = go.Figure(go.Scatter(x=stem_x, y=stem_y, mode="lines", line=dict(color=NEUTRAL, width=3),
+                               hoverinfo="skip", showlegend=False))
+    colors = [NEUTRAL if segment == "Ổn định" else (CHURN if rate > base else STAY)
+              for segment, rate in zip(table.ActionSegment, table.rate)]
+    fig.add_trace(go.Scatter(
+        x=table.rate, y=labels, mode="markers+text", marker=dict(size=14, color=colors),
+        text=table.rate.map(fmt_pct), textposition="middle right", showlegend=False,
+        customdata=_hover(table), hovertemplate=HOVER_H,
+    ))
+    add_baseline(fig, base, axis="x")
+    fig.update_xaxes(title="Tỷ lệ khách thực tế rời bỏ", tickformat=".0%",
+                     range=[0, max(float(table.rate.max()), base, 0.01) * 1.25])
+    fig.update_yaxes(title=None, autorange="reversed", categoryorder="array", categoryarray=labels)
+    top = table.iloc[0]
+    return apply_style(
+        fig, f"Ưu tiên theo tỷ lệ rời bỏ: “{top.ActionSegment}” cao nhất ({fmt_pct(top.rate)})",
+        f"n = {fmt_n(table.n.sum())} khách · đường đứt = trung bình {fmt_pct(base)} · nhóm ổn định để đối chiếu",
+        height=max(400, 72 * len(table) + 140),
+    )
+
+
 # ---------- danh mục C01–C20 (tên file PNG, hàm dựng) ----------
 
 def _cats(df, col):
@@ -695,4 +756,6 @@ FIGURES = {
     "C19a_risk_decile": decile_bar,
     "C19b_gain_curve": gain_curve,
     "C20_phan_khuc": segment_bubble,
+    "C20b_uu_tien_doanh_thu": segment_revenue_rank,
+    "C20c_uu_tien_ty_le": segment_rate_rank,
 }
