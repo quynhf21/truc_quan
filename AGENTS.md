@@ -2,7 +2,7 @@
 
 Đọc **`docs/PLAN_TRUC_QUAN_HOA.md` trước khi làm bất cứ việc gì**. Đó là plan đã duyệt.
 
-Task hiện tại theo yêu cầu người dùng: thống nhất mô hình, toàn bộ EDA và dashboard theo đúng 10 predictor của mô hình. Mỗi predictor phải có trực quan trực tiếp, gồm hai mức thay đổi và số cuộc gọi giờ cao điểm. Bỏ các biểu đồ/chiều chỉ dùng biến ngoài mô hình; không để ô trống. Có thể dùng nhãn rời bỏ, band và điểm suy ra từ bộ 10. Giữ form Plotly, bảng màu và các quy tắc C20 hiện tại; không huấn luyện lại. Các mốc 52 biến trong tài liệu T9/T10 là lịch sử.
+Task đang mở: **T10** — [`docs/TASK_T10_CHAY_LAI_LOCAL.md`](docs/TASK_T10_CHAY_LAI_LOCAL.md) (chạy lại trên Windows, đối chiếu số, chỉ báo cáo).
 
 ## Mục tiêu
 Đồ án môn **Trực quan hóa dữ liệu**: xử lý dữ liệu cơ bản → nhiều biểu đồ đa dạng → insight có số →
@@ -16,9 +16,9 @@ dashboard chuẩn BI → chính sách giữ chân. Mô hình ML chỉ là phần
 
 ## Cấm
 - Sửa `data/cell2celltrain.csv`, notebook `work/pipeline/01–03`, `pages_src/`, `export_pages.py`, `.github/workflows/` (token push không có quyền workflow).
-- Thêm manifest/hash/verify/audit script mới hoặc huấn luyện lại mô hình trong task bổ sung EDA hiện tại.
+- Train lại mô hình, thêm manifest/hash/verify/audit script mới.
 - T9 (nâng cấp mô hình lên 52 cột, [`docs/TASK_T9_NANG_CAP_MO_HINH.md`](docs/TASK_T9_NANG_CAP_MO_HINH.md)) **đã xong**.
-  Yêu cầu mới về 10 biến thay thế cấu hình T9; không dùng kết quả 52 biến làm kết quả hiện hành.
+  Không còn ngoại lệ nào: không sửa notebook 01–03, không train lại.
 - Chạy lại pipeline để kiểm tra thì được, nhưng **không commit** output notebook/ảnh sinh ra (xem T10).
 - Hard-code số liệu (churn rate, n...) trong code hoặc tiêu đề biểu đồ; mọi số phải tính từ dữ liệu.
 - Commit `.venv/`, `work/build/`, file dữ liệu sinh ra.

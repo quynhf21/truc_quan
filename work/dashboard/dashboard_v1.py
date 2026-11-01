@@ -277,7 +277,7 @@ def risk(frame):
                       html.P("RiskScore dùng dự đoán 3-fold ngoài mẫu; các chỉ số của bộ lọc chỉ mô tả lát cắt hiện tại.")], className="page-intro"),
             html.Div([card("ROC-AUC", f"{auc:.3f}" if np.isfinite(auc) else "n.a.", "Ngoài mẫu, cohort sau lọc"),
                       card("PR-AUC", f"{pr:.3f}" if np.isfinite(pr) else "n.a.", "Baseline PR = churn rate"),
-                      card("Log loss toàn nguồn", f"{MODEL['log_loss']:.3f}", f"Mô hình {len(MODEL['features'])} biến"),
+                      card("Log loss toàn nguồn", f"{MODEL['log_loss']:.3f}", "Mô hình 52 cột"),
                       card("Depth phổ biến", str(MODEL["chosen_depth"]), "Chọn trong train của từng fold")], className="kpi-grid"),
             insight("Ý NGHĨA VẬN HÀNH", f"Nếu chỉ liên hệ top 10% risk trong lát cắt này, nhóm có {fmt_n(min(len(frame), max(1, int(np.ceil(len(frame)*.10)))))} khách. Đường gain và bảng capacity bên dưới cho thấy bao nhiêu churner quá khứ được tiếp cận; chúng chưa đo hiệu quả của chính sách giữ chân."),
             html.Div([panel("Phân tầng rủi ro", styled(fig_decile, percent=True)),

@@ -31,4 +31,4 @@ Thêm `--cwd project` để kiểm tra notebook khi working directory là projec
 
 `verify_notebooks.py` kiểm tra execution count, lỗi, output bảng/biểu đồ; đồng thời thử dữ liệu hợp lệ, thiếu manifest/processed, raw/QA/parquet bị đổi và manifest chưa PASS trong fixture riêng.
 
-Phần modeling dùng đúng 10 predictor đã chuẩn hóa ở notebook 01, depth 4/6, tối đa 1500 vòng; cấu hình CPU 4 threads được in trong notebook. Phiên bản `cell2cell-catboost-oof-10-v1` không ghép thêm predictor từ raw CSV. Kết quả mới nhất nằm trong output notebook 03 và `work/build/model_metrics.json`; không ép metric bằng kết quả lịch sử. Script `work/experiments/compare_models.py` cũng giới hạn mọi thuật toán ở cùng bộ 10 biến.
+Phần modeling (v2) dùng 52 cột nguồn, depth 4/6, tối đa 1500 vòng; cấu hình CPU 4 threads được in trong notebook. Kết quả mới nhất nằm trong output notebook 03 và `work/build/model_metrics.json`; không ép metric bằng kết quả lịch sử. So sánh với Logistic regression và LightGBM nằm ở `work/experiments/compare_models.py`.

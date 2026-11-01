@@ -2,7 +2,7 @@
 
 3-fold OOF (seed 2026); trong mỗi fold, 20% train làm inner validation để dừng sớm,
 rồi fit lại trên cả fold train. Kết quả ghi ra work/build/model_comparison.csv.
-Mọi cấu hình dùng cùng 10 biến. Thêm `--quick` để chỉ chạy CatBoost.
+Chạy 4–6 phút trên 4 CPU. Thêm `--quick` để chỉ chạy A và D.
 """
 
 from __future__ import annotations
@@ -32,12 +32,16 @@ OLD10 = [
     "TotalRecurringCharge", "CreditRating", "MonthlyMinutes", "PercChangeMinutes",
     "PercChangeRevenues", "PeakCallsInOut",
 ]
+# Retention contact/offer có thể xảy ra ngay trước khi rời bỏ (nguy cơ leakage);
+# ServiceArea bị loại theo project_contract.md.
+EXCLUDE_V2 = ["CustomerID", "Churn", "ServiceArea", "RetentionCalls", "RetentionOffersAccepted",
+              "MadeCallToRetentionTeam"]
 
 
 def load():
     raw = pd.read_csv(RAW, na_values=["NA"])
     y = raw.Churn.eq("Yes").astype(int).to_numpy()
-    X = raw[OLD10].copy()
+    X = raw.drop(columns=["CustomerID", "Churn"])
     cats = [c for c in X if X[c].dtype == object]
     X[cats] = X[cats].fillna("Unknown").astype(str)
     return X, y, cats
@@ -108,13 +112,16 @@ def summarize(name, n_features, y, s, fold_auc, seconds):
 
 def main() -> None:
     X, y, cats = load()
+    v2 = [c for c in X if c not in EXCLUDE_V2]
     experiments = [
-        ("A", "CatBoost 10 biến", OLD10, catboost_fp()),
-        ("B", "Logistic regression 10 biến", OLD10, logistic_fp),
-        ("C", "LightGBM 10 biến", OLD10, lightgbm_fp),
+        ("A", "CatBoost 10 cột (notebook 03 hiện tại)", OLD10, catboost_fp()),
+        ("B", "Logistic regression, cột v2", v2, logistic_fp),
+        ("C", "CatBoost tất cả cột (tham khảo, vi phạm contract)", list(X), catboost_fp()),
+        ("D", "CatBoost cột v2 (đề xuất)", v2, catboost_fp()),
+        ("E", "LightGBM cột v2", v2, lightgbm_fp),
     ]
     if "--quick" in sys.argv:
-        experiments = [e for e in experiments if e[0] == "A"]
+        experiments = [e for e in experiments if e[0] in {"A", "D"}]
     rows = []
     for key, name, cols, fit_predict in experiments:
         t0 = time.time()

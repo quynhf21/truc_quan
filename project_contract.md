@@ -55,9 +55,7 @@ Tập 49.752 của tài liệu hiện tại là complete-case trên **toàn bộ
 
 ## 5. Phạm vi feature và mô hình
 
-Mô hình chính `cell2cell-catboost-oof-10-v1` chỉ dùng đúng 10 biến: `MonthsInService`, `CurrentEquipmentDays`, `HandsetWebCapable`, `MonthlyRevenue`, `TotalRecurringCharge`, `CreditRating`, `MonthlyMinutes`, `PercChangeMinutes`, `PercChangeRevenues`, `PeakCallsInOut`. Notebook 03 lấy trực tiếp bộ 10 biến đã được notebook 01 chuẩn hóa, không ghép thêm predictor từ CSV nguồn. Kết quả hiện hành được tính lại trong `work/build/model_metrics.json`; không dùng AUC của cấu hình trước để thay thế kết quả chạy.
-
-EDA và dashboard dùng cùng bộ 10 predictor của mô hình. Mỗi biến có trực quan trực tiếp; các biểu đồ về khu vực, giữ chân và nhân khẩu học ngoài bộ 10 được bỏ. Các band, tỷ lệ rời bỏ, điểm rủi ro và phân khúc được suy ra từ bộ 10 và nhãn. C18 giữ 10 predictor cộng nhãn rời bỏ; C20 giữ nguyên các quy tắc hiện tại. Mã khách chỉ phục vụ đối soát và ghép điểm. CSV nguồn vẫn giữ nguyên cấu trúc gốc; số cột nguồn không phải số predictor được chọn.
+Mô hình chính (v2, đổi ngày 31/10/2026) nhận mọi cột của raw CSV trừ `CustomerID`, `Churn`, `ServiceArea` và 3 trường retention: 52 cột. Lý do: so sánh trong `work/experiments/compare_models.py` cho AUC 0,672 → 0,681. Notebook 01 vẫn chuẩn hóa 10 base feature (`MonthsInService`, `CurrentEquipmentDays`, `HandsetWebCapable`, `MonthlyRevenue`, `TotalRecurringCharge`, `CreditRating`, `MonthlyMinutes`, `PercChangeMinutes`, `PercChangeRevenues`, `PeakCallsInOut`); notebook 03 ghép thêm các cột còn lại từ raw CSV đã xác nhận SHA256.
 
 `CustomerID` chỉ dùng để ghép kết quả. Các trường retention contact/offer và `ServiceArea` không vào mô hình. Missing được xử lý trong pipeline huấn luyện, học quy tắc từ train fold và áp dụng cho validation/holdout; báo số khách không thể chấm điểm nếu còn. Risk score, decile và lift để trình bày phải dựa trên dự đoán cho dòng chưa dùng fit model. Tối thiểu báo ROC-AUC, PR-AUC, log loss, calibration và lift@5/10/20%.
 

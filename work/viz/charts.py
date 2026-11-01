@@ -27,39 +27,53 @@ MIN_N = 100  # nhóm nhỏ hơn ngưỡng này không đủ tin cậy để so s
 
 CREDIT_ORDER = ["1-Highest", "2-High", "3-Good", "4-Medium", "5-Low", "6-VeryLow", "7-Lowest"]
 
-FIELD_LABELS = {'CustomerID': 'Mã khách hàng',
- 'Churn': 'Trạng thái rời bỏ',
- 'ChurnFlag': 'Rời bỏ',
- 'MonthlyRevenue': 'Doanh thu tháng',
- 'MonthlyMinutes': 'Phút gọi mỗi tháng',
- 'TotalRecurringCharge': 'Phí định kỳ',
- 'PercChangeMinutes': 'Thay đổi phút gọi',
- 'PercChangeRevenues': 'Thay đổi doanh thu',
- 'PeakCallsInOut': 'Cuộc gọi giờ cao điểm',
- 'MonthsInService': 'Tháng sử dụng dịch vụ',
- 'CurrentEquipmentDays': 'Tuổi thiết bị',
- 'HandsetWebCapable': 'Thiết bị hỗ trợ web',
- 'CreditRating': 'Hạng tín dụng',
- 'TenureBand': 'Nhóm thời gian sử dụng',
- 'EquipmentAgeBand': 'Nhóm tuổi thiết bị',
- 'MinutesBand': 'Nhóm phút gọi',
- 'ActionSegment': 'Phân khúc hành động',
- 'RiskScore': 'Điểm rủi ro',
- 'RiskDecile': 'Nhóm rủi ro',
- 'n': 'Số khách',
- 'churners': 'Khách rời bỏ',
- 'rate': 'Tỷ lệ rời bỏ',
- 'revenue': 'Tổng doanh thu tháng',
- 'avg_revenue': 'Doanh thu tháng trung bình',
- 'revenue_at_risk': 'Doanh thu tháng bị đe dọa',
- 'ChargeBand': 'Nhóm phí định kỳ',
- 'UsageTrendBand': 'Thay đổi phút gọi',
- 'RevenueTrendBand': 'Thay đổi doanh thu',
- 'PeakCallsBand': 'Nhóm cuộc gọi giờ cao điểm'}
+FIELD_LABELS = {
+    "CustomerID": "Mã khách hàng", "Churn": "Trạng thái rời bỏ", "ChurnFlag": "Rời bỏ",
+    "MonthlyRevenue": "Doanh thu tháng", "MonthlyMinutes": "Phút gọi mỗi tháng",
+    "TotalRecurringCharge": "Phí định kỳ", "DirectorAssistedCalls": "Cuộc gọi qua tổng đài hỗ trợ",
+    "OverageMinutes": "Phút vượt gói", "RoamingCalls": "Cuộc gọi chuyển vùng",
+    "PercChangeMinutes": "Thay đổi phút gọi", "PercChangeRevenues": "Thay đổi doanh thu",
+    "DroppedCalls": "Cuộc gọi bị rớt", "BlockedCalls": "Cuộc gọi bị chặn",
+    "UnansweredCalls": "Cuộc gọi không trả lời", "CustomerCareCalls": "Cuộc gọi chăm sóc khách hàng",
+    "ThreewayCalls": "Cuộc gọi ba bên", "ReceivedCalls": "Cuộc gọi nhận được",
+    "OutboundCalls": "Cuộc gọi đi", "InboundCalls": "Cuộc gọi đến",
+    "PeakCallsInOut": "Cuộc gọi giờ cao điểm", "OffPeakCallsInOut": "Cuộc gọi ngoài giờ cao điểm",
+    "DroppedBlockedCalls": "Cuộc gọi rớt hoặc bị chặn", "CallForwardingCalls": "Cuộc gọi chuyển tiếp",
+    "CallWaitingCalls": "Cuộc gọi chờ", "MonthsInService": "Tháng sử dụng dịch vụ",
+    "UniqueSubs": "Số thuê bao đã đăng ký", "ActiveSubs": "Số thuê bao hoạt động",
+    "ServiceArea": "Mã vùng phục vụ", "Handsets": "Số thiết bị", "HandsetModels": "Số mẫu thiết bị",
+    "CurrentEquipmentDays": "Tuổi thiết bị", "AgeHH1": "Tuổi thành viên thứ nhất",
+    "AgeHH2": "Tuổi thành viên thứ hai", "ChildrenInHH": "Có trẻ em trong hộ",
+    "HandsetRefurbished": "Thiết bị tân trang", "HandsetWebCapable": "Thiết bị hỗ trợ mạng",
+    "TruckOwner": "Sở hữu xe tải", "RVOwner": "Sở hữu xe du lịch lưu động",
+    "Homeownership": "Tình trạng sở hữu nhà", "BuysViaMailOrder": "Mua hàng qua thư",
+    "RespondsToMailOffers": "Phản hồi ưu đãi qua thư", "OptOutMailings": "Từ chối nhận thư",
+    "NonUSTravel": "Du lịch ngoài Hoa Kỳ", "OwnsComputer": "Sở hữu máy tính",
+    "HasCreditCard": "Có thẻ tín dụng", "RetentionCalls": "Cuộc gọi giữ chân",
+    "RetentionOffersAccepted": "Số ưu đãi giữ chân được nhận", "NewCellphoneUser": "Người mới dùng điện thoại",
+    "NotNewCellphoneUser": "Người đã dùng điện thoại", "ReferralsMadeBySubscriber": "Số lượt giới thiệu",
+    "IncomeGroup": "Nhóm thu nhập", "OwnsMotorcycle": "Sở hữu xe máy",
+    "AdjustmentsToCreditRating": "Điều chỉnh hạng tín dụng", "HandsetPrice": "Giá thiết bị",
+    "MadeCallToRetentionTeam": "Đã gọi bộ phận giữ chân", "CreditRating": "Hạng tín dụng",
+    "PrizmCode": "Khu vực sinh sống", "Occupation": "Nghề nghiệp", "MaritalStatus": "Đã kết hôn",
+    "Region": "Vùng", "RetentionOfferAccepted": "Đã nhận ưu đãi giữ chân",
+    "TenureBand": "Nhóm thời gian sử dụng", "EquipmentAgeBand": "Nhóm tuổi thiết bị",
+    "CareCallsBand": "Nhóm cuộc gọi chăm sóc", "DroppedBand": "Nhóm cuộc gọi rớt",
+    "OverageBand": "Nhóm phút vượt gói", "MinutesBand": "Nhóm phút gọi",
+    "ActionSegment": "Phân khúc hành động", "RiskScore": "Điểm rủi ro", "RiskDecile": "Nhóm rủi ro",
+    "n": "Số khách", "churners": "Khách rời bỏ", "rate": "Tỷ lệ rời bỏ",
+    "revenue": "Tổng doanh thu tháng", "avg_revenue": "Doanh thu tháng trung bình",
+    "revenue_at_risk": "Doanh thu tháng bị đe dọa",
+}
 VALUE_LABELS = {
-    'CreditRating': dict(zip(CREDIT_ORDER, ["1-Cao nhất", "2-Cao", "3-Tốt", "4-Trung bình",
+    "CreditRating": dict(zip(CREDIT_ORDER, ["1-Cao nhất", "2-Cao", "3-Tốt", "4-Trung bình",
                                           "5-Thấp", "6-Rất thấp", "7-Thấp nhất"])),
-    'Churn': {"Yes": "Rời bỏ", "No": "Ở lại"},
+    "Occupation": {"Clerical": "Văn phòng", "Crafts": "Thủ công", "Homemaker": "Nội trợ",
+                   "Other": "Khác", "Professional": "Chuyên môn", "Retired": "Nghỉ hưu",
+                   "Self": "Tự kinh doanh", "Student": "Sinh viên"},
+    "PrizmCode": {"Other": "Khác", "Rural": "Nông thôn", "Suburban": "Ngoại ô", "Town": "Thị trấn"},
+    "Churn": {"Yes": "Rời bỏ", "No": "Ở lại"},
+    "Homeownership": {"Known": "Đã xác định"},
 }
 SUMMARY_LABELS = {"count": "Số giá trị", "mean": "Trung bình", "std": "Độ lệch chuẩn",
                   "min": "Nhỏ nhất", "max": "Lớn nhất", "50%": "Trung vị",
@@ -196,8 +210,6 @@ def empty_figure(message="Không có dữ liệu cho bộ lọc này") -> go.Fig
     fig.update_xaxes(visible=False)
     fig.update_yaxes(visible=False)
     return apply_style(fig, "")
-
-
 
 
 # ---------- C01–C02: tổng quan ----------
@@ -369,95 +381,151 @@ def tenure_equipment_heatmap(df: pd.DataFrame) -> go.Figure:
                        f"Ô trống: nhóm có < {MIN_N} khách", height=420)
 
 
-# ---------- C09–C12: thiết bị và mức sử dụng ----------
+# ---------- C08–C12: hành vi dịch vụ ----------
 
-
-
+def retention_funnel(df: pd.DataFrame) -> go.Figure:
+    stages = [
+        ("Tất cả khách", df),
+        ("Đã gọi bộ phận giữ chân", df[df.MadeCallToRetentionTeam == "Yes"]),
+        ("Đã nhận ưu đãi giữ chân", df[df.RetentionOfferAccepted == "Yes"]),
+    ]
+    names = [s for s, _ in stages]
+    n = [len(d) for _, d in stages]
+    rates = [baseline(d) if len(d) else 0 for _, d in stages]
+    fig = make_subplots(rows=1, cols=2, column_widths=[0.55, 0.45], horizontal_spacing=0.18,
+                        subplot_titles=["Số khách", "Tỷ lệ rời bỏ"], specs=[[{"type": "funnel"}, {"type": "bar"}]])
+    fig.add_trace(go.Funnel(y=names, x=n, marker=dict(color=[STAY, ACCENT, ACCENT]), textinfo="value",
+                            texttemplate="%{value:,.0f}", hovertemplate="%{y}: %{x:,.0f} khách<extra></extra>"), 1, 1)
+    fig.add_trace(go.Bar(y=names, x=rates, orientation="h", marker_color=[STAY, CHURN, CHURN],
+                         text=[fmt_pct(r) for r in rates], textposition="outside",
+                         hovertemplate="%{y}: %{x:.1%}<extra></extra>"), 1, 2)
+    fig.update_yaxes(autorange="reversed", showticklabels=False, row=1, col=2)
+    fig.update_xaxes(tickformat=".0%", range=[0, max(rates) * 1.3 if max(rates) else 1], row=1, col=2)
+    fig = apply_style(fig, f"Nhận ưu đãi giữ chân rồi vẫn có tỷ lệ rời bỏ {fmt_pct(rates[2])}: chương trình hiện tại không giữ được khách",
+                      f"So với trung bình {fmt_pct(rates[0])} · khách đã liên hệ bộ phận giữ chân là nhóm báo động", height=360)
+    fig.update_layout(showlegend=False)
+    fig.update_annotations(font=dict(size=12, color=MUTED))
+    return fig
 
 
 def device_grouped(df: pd.DataFrame) -> go.Figure:
-    table = rate_by(df[df.HandsetWebCapable.isin(["Yes", "No"])], "HandsetWebCapable")
+    rows = []
+    for col, label in [("HandsetWebCapable", "Máy hỗ trợ mạng"), ("HandsetRefurbished", "Máy tân trang")]:
+        t = rate_by(df[df[col].isin(["Yes", "No"])], col)
+        t["feature"] = label
+        t["value"] = t[col].map({"Yes": "Có", "No": "Không"})
+        rows.append(t)
+    table = pd.concat(rows, ignore_index=True)
     if table.empty:
         return empty_figure()
     fig = go.Figure()
-    for value, name, color in [("Yes", "Có", STAY), ("No", "Không", ACCENT)]:
-        part = table[table.HandsetWebCapable == value]
-        fig.add_trace(go.Bar(
-            x=["Máy hỗ trợ web"] * len(part), y=part.rate, name=name, marker_color=color,
-            text=[fmt_pct(rate) for rate in part.rate], textposition="outside", customdata=_hover(part),
-            hovertemplate=HOVER.replace("%{x}", f"Máy hỗ trợ web: {name}"),
-        ))
+    for value, color in [("Có", STAY), ("Không", ACCENT)]:
+        part = table[table.value == value]
+        fig.add_trace(go.Bar(x=part.feature, y=part.rate, name=value, marker_color=color,
+                             text=[fmt_pct(r) for r in part.rate], textposition="outside",
+                             customdata=_hover(part), hovertemplate=HOVER.replace("%{x}", f"%{{x}}: {value}")))
+    # Máy không hỗ trợ mạng có tỷ lệ rời bỏ cao hơn → tô đỏ để nhấn mạnh
+    web_no = table[(table.feature == "Máy hỗ trợ mạng") & (table.value == "Không")]
+    web_yes = table[(table.feature == "Máy hỗ trợ mạng") & (table.value == "Có")]
     add_baseline(fig, baseline(df))
     fig.update_layout(barmode="group")
-    fig.update_yaxes(tickformat=".0%", range=[0, max(float(table.rate.max()) * 1.25, 0.01)], title="Tỷ lệ rời bỏ")
-    title = "Thiết bị hỗ trợ web và tỷ lệ rời bỏ"
-    web_no = table[table.HandsetWebCapable == "No"]
-    web_yes = table[table.HandsetWebCapable == "Yes"]
+    fig.update_yaxes(tickformat=".0%", range=[0, table.rate.max() * 1.25], title="Tỷ lệ rời bỏ")
+    title = "Đặc điểm thiết bị và tỷ lệ rời bỏ"
     if len(web_no) and len(web_yes):
-        title = f"Máy không hỗ trợ web có tỷ lệ rời bỏ {fmt_pct(web_no.rate.iloc[0])} so với {fmt_pct(web_yes.rate.iloc[0])} ở máy có mạng"
-    return apply_style(fig, title, f"n = {fmt_n(table.n.sum())} khách · so sánh Có / Không hỗ trợ web")
+        title = (f"Máy không hỗ trợ mạng có tỷ lệ rời bỏ {fmt_pct(web_no.rate.iloc[0])} so với "
+                 f"{fmt_pct(web_yes.rate.iloc[0])} ở máy có mạng")
+    return apply_style(fig, title, "Máy tân trang cũng có tỷ lệ rời bỏ cao hơn máy mới")
 
 
-
-
-
-def usage_bubble(df: pd.DataFrame) -> go.Figure:
-    """Giữ bubble theo mức sử dụng, bỏ chiều vượt gói ngoài phạm vi."""
-    data = df[~df.MinutesBand.isin(["Không rõ"])]
-    table = rate_by(data, "MinutesBand", order=_cats(df, "MinutesBand"), min_n=MIN_N)
+def overage_bubble(df: pd.DataFrame) -> go.Figure:
+    data = df[~df.MinutesBand.isin(["Không rõ"]) & ~df.OverageBand.isin(["Không rõ"])]
+    table = (data.groupby(["MinutesBand", "OverageBand"], observed=True)[TARGET]
+             .agg(n="size", churners="sum").reset_index())
+    table = table[table.n >= MIN_N]
     if table.empty:
         return empty_figure()
-    fig = go.Figure(go.Scatter(
-        x=table.MinutesBand.astype(str), y=table.rate, mode="markers", showlegend=False,
-        marker=dict(size=table.n, sizemode="area", sizeref=2 * table.n.max() / 60 ** 2, sizemin=6,
-                    color=ACCENT, line=dict(color="white", width=1)),
-        customdata=_hover(table), hovertemplate=HOVER,
-    ))
+    table["rate"] = table.churners / table.n
+    palette = {"0": NEUTRAL, "≤50": STAY, "50–200": ACCENT, ">200": CHURN}
+    fig = go.Figure()
+    for band in [b for b in palette if b in set(table.OverageBand.astype(str))]:
+        part = table[table.OverageBand.astype(str) == band]
+        fig.add_trace(go.Scatter(
+            x=part.MinutesBand.astype(str), y=part.rate, mode="markers", name=f"Vượt gói {band} phút",
+            marker=dict(size=part.n, sizemode="area", sizeref=2 * table.n.max() / 60 ** 2, sizemin=6,
+                        color=palette[band], line=dict(color="white", width=1)),
+            customdata=_hover(part), hovertemplate=HOVER.replace("%{x}", f"%{{x}} · vượt {band}")))
     add_baseline(fig, baseline(df))
     fig.update_yaxes(tickformat=".0%", title="Tỷ lệ rời bỏ", rangemode="tozero")
     fig.update_xaxes(title="Phút gọi / tháng", type="category",
                      categoryorder="array", categoryarray=["≤150 phút", "150–500 phút", ">500 phút"])
-    top = table.loc[table.rate.idxmax()]
-    return apply_style(fig, f"Nhóm {top.MinutesBand} có tỷ lệ rời bỏ cao nhất ({fmt_pct(top.rate)})",
-                       f"Kích thước bong bóng = số khách · n = {fmt_n(table.n.sum())} khách", height=400)
+    over = rate_by(data, "OverageBand")
+    top = over[over.OverageBand.astype(str) == ">200"]
+    title = "Gói cước và tỷ lệ rời bỏ: dùng ít và vượt gói nhiều đều rủi ro"
+    if len(top):
+        title = f"Vượt gói > 200 phút có tỷ lệ rời bỏ {fmt_pct(top.rate.iloc[0])}; dùng ít (≤150 phút) cũng rủi ro"
+    return apply_style(fig, title, "Kích thước bong bóng = số khách", height=400)
 
 
+# ---------- C13–C15: địa lý ----------
+
+def region_table(df: pd.DataFrame, min_n=800) -> pd.DataFrame:
+    return rate_by(df[df.Region != "Unknown"], "Region", min_n=min_n)
 
 
-
-# ---------- C14: phân bố khách theo thời gian sử dụng ----------
-
-
-
-
-
-
-
-
-def tenure_treemap(df: pd.DataFrame) -> go.Figure:
-    """Giữ treemap và cấp tenure; loại cấp vùng phục vụ ngoài bộ 10."""
-    table = rate_by(df, "TenureBand", order=_cats(df, "TenureBand"))
-    table = table[table.churners > 0]
+def region_bar(df: pd.DataFrame, min_n=800) -> go.Figure:
+    table = region_table(df, min_n)
+    if len(table) < 2:
+        table = region_table(df, MIN_N)
     if table.empty:
         return empty_figure()
-    fig = px.treemap(table, path=[px.Constant("Tất cả"), "TenureBand"], values="churners",
+    hi, lo = table.loc[table.rate.idxmax()], table.loc[table.rate.idxmin()]
+    gap = 100 * (hi.rate - lo.rate)
+    return rate_bar(df[df.Region.isin(table.Region)], "Region", "Vùng", horizontal=True, base=baseline(df),
+                    title=f"Vùng {hi.Region} có tỷ lệ rời bỏ {fmt_pct(hi.rate)}, cao hơn {lo.Region} {fmt_ratio(gap)} điểm %")
+
+
+def region_treemap(df: pd.DataFrame, top=12) -> go.Figure:
+    churned = df[df[TARGET] == 1]
+    if churned.empty:
+        return empty_figure()
+    top_regions = churned.Region.value_counts().head(top).index
+    data = df.assign(Region=df.Region.where(df.Region.isin(top_regions), "Vùng khác"))
+    table = (data.groupby(["Region", "TenureBand"], observed=True)[TARGET]
+             .agg(n="size", churners="sum").reset_index())
+    table = table[table.churners > 0]
+    table["rate"] = table.churners / table.n
+    fig = px.treemap(table, path=[px.Constant("Tất cả"), "Region", "TenureBand"], values="churners",
                      color="rate", color_continuous_scale="Reds", custom_data=["n", "rate"])
-    fig.update_traces(
-        hovertemplate="<b>%{label}</b><br>Khách: %{customdata[0]:,.0f}<br>Khách rời bỏ: %{value:,.0f}"
-                      "<br>Tỷ lệ rời bỏ: %{customdata[1]:.1%}<extra></extra>",
-        texttemplate="%{label}<br>%{value:,.0f}", root_color="white",
-    )
+    fig.update_traces(hovertemplate="<b>%{label}</b><br>Khách rời bỏ: %{value:,.0f}<extra></extra>",
+                      texttemplate="%{label}<br>%{value:,.0f}", root_color="white")
     fig.update_coloraxes(colorbar=dict(tickformat=".0%", title="Tỷ lệ rời bỏ"))
-    lead = table.loc[table.churners.idxmax()]
-    return apply_style(fig, f"Nhóm {lead.TenureBand} có nhiều khách rời bỏ nhất ({fmt_n(lead.churners)} khách)",
-                       f"Diện tích = số khách rời bỏ · màu = tỷ lệ rời bỏ · n = {fmt_n(len(df))} khách", height=460)
+    lead = churned.Region.value_counts()
+    lead = lead[lead.index != "Unknown"]
+    share = lead.iloc[0] / len(churned) if len(lead) else 0
+    return apply_style(fig, f"{lead.index[0]} mất nhiều khách nhất về số lượng ({fmt_pct(share)} tổng khách rời bỏ)",
+                       f"Diện tích = số khách rời bỏ, màu = tỷ lệ rời bỏ · {top} vùng lớn nhất", height=460)
 
 
-
-
-
-
-
+def region_pareto(df: pd.DataFrame) -> go.Figure:
+    churned = df[(df[TARGET] == 1) & (df.Region != "Unknown")]
+    if churned.empty:
+        return empty_figure()
+    counts = churned.Region.value_counts()
+    cum = counts.cumsum() / counts.sum()
+    k80 = int((cum < 0.8).sum() + 1)
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    fig.add_trace(go.Bar(x=counts.index, y=counts.values, name="Số khách rời bỏ",
+                         marker_color=[CHURN if i < k80 else NEUTRAL for i in range(len(counts))],
+                         hovertemplate="%{x}: %{y:,.0f} khách rời bỏ<extra></extra>"), secondary_y=False)
+    fig.add_trace(go.Scatter(x=cum.index, y=cum.values, name="% tích lũy", mode="lines",
+                             line=dict(color=INK, width=2), hovertemplate="%{x}: %{y:.0%}<extra></extra>"),
+                  secondary_y=True)
+    fig.add_hline(y=0.8, line_dash="dot", line_color=MUTED, secondary_y=True)
+    fig.update_yaxes(title="Số khách rời bỏ", secondary_y=False)
+    fig.update_yaxes(title="% tích lũy", tickformat=".0%", range=[0, 1.05], secondary_y=True, showgrid=False)
+    fig.update_xaxes(type="category", tickangle=-45)
+    return apply_style(fig, f"{k80}/{len(counts)} vùng chiếm 80% số khách rời bỏ",
+                       "Pareto: đỏ = nhóm vùng tạo nên 80% khách rời bỏ", height=400)
 
 
 # ---------- C16–C18: khách hàng ----------
@@ -472,10 +540,38 @@ def credit_bar(df: pd.DataFrame) -> go.Figure:
                     title=f"Khách tín dụng tốt (hạng 1–3) có tỷ lệ rời bỏ {fmt_pct(good)}, cao hơn nhóm 4–7 ({fmt_pct(low)})")
 
 
+def demographic_multiples(df: pd.DataFrame) -> go.Figure:
+    dims = [("IncomeGroup", "Nhóm thu nhập"), ("Occupation", "Nghề nghiệp"),
+            ("PrizmCode", "Khu vực sống"), ("MaritalStatus", "Hôn nhân")]
+    fig = make_subplots(rows=1, cols=4, shared_yaxes=True, subplot_titles=[d[1] for d in dims], horizontal_spacing=0.03)
+    base = baseline(df)
+    spreads = []
+    for i, (col, _) in enumerate(dims, start=1):
+        t = rate_by(df, col, min_n=MIN_N)
+        if col == "IncomeGroup":
+            t = t.sort_values(col, key=lambda s: pd.to_numeric(s, errors="coerce"))
+        else:
+            t = t.sort_values("rate", ascending=False)
+        if len(t):
+            spreads.append(t.rate.max() - t.rate.min())
+        fig.add_trace(go.Bar(x=t[col].astype(str).map(lambda value: display_value(col, value)), y=t.rate, marker_color=[CHURN if r > base else STAY for r in t.rate],
+                             customdata=_hover(t), hovertemplate=HOVER, showlegend=False), row=1, col=i)
+        fig.add_hline(y=base, line_dash="dash", line_color=MUTED, line_width=1, row=1, col=i)
+        fig.update_xaxes(type="category", tickangle=-45, row=1, col=i)
+    fig.update_yaxes(tickformat=".0%", rangemode="tozero")
+    fig.update_yaxes(title="Tỷ lệ rời bỏ", row=1, col=1)
+    spread = max(spreads) if spreads else 0
+    fig = apply_style(fig, f"Nhân khẩu học chênh lệch nhỏ (tối đa {fmt_ratio(100 * spread)} điểm %): ưu tiên tín hiệu hành vi",
+                      f"Cùng thang trục y · nhóm có ≥{MIN_N} khách · nét đứt = trung bình", height=420)
+    fig.update_annotations(font=dict(size=12, color=MUTED))
+    return fig
 
 
-
-
+CORR_COLUMNS = [
+    "ChurnFlag", "MonthsInService", "CurrentEquipmentDays", "MonthlyRevenue", "MonthlyMinutes",
+    "TotalRecurringCharge", "OverageMinutes", "PercChangeMinutes", "DroppedBlockedCalls",
+    "CustomerCareCalls", "ReceivedCalls", "PeakCallsInOut", "RetentionCalls", "HandsetModels", "AgeHH1",
+]
 
 
 C18_FEATURES = [
@@ -658,24 +754,25 @@ def _cats(df, col):
 
 FIGURES = {
     "C01_ty_le_churn": churn_donut,
-    "C02_du_lieu_thieu": lambda df: missing_bar(df, C18_FEATURES),
+    "C02_du_lieu_thieu": lambda df: missing_bar(df, CORR_COLUMNS[1:]),
     "C03_phan_bo_tuoi_may": lambda df: distribution_overlay(df, "CurrentEquipmentDays", "Tuổi thiết bị"),
-    "C04_box_plot": lambda df: box_by_churn(df, {"CurrentEquipmentDays": "Tuổi thiết bị (ngày)", "MonthlyRevenue": "Doanh thu/tháng ($)"}),
-    "C04b_phan_bo_doanh_thu": lambda df: distribution_overlay(df, "MonthlyRevenue", "Doanh thu tháng ($)"),
-    "C04c_phan_bo_phi_dinh_ky": lambda df: distribution_overlay(df, "TotalRecurringCharge", "Phí định kỳ ($)"),
-    "C04d_churn_phi_dinh_ky": lambda df: rate_bar(df[df.ChargeBand.isin(["≤30", "30–60", ">60"])],
-                                                "ChargeBand", "Phí định kỳ", order=_cats(df, "ChargeBand"), base=baseline(df)),
+    "C04_box_plot": lambda df: box_by_churn(df, {"CurrentEquipmentDays": "Tuổi thiết bị (ngày)",
+                                                "MonthlyRevenue": "Doanh thu/tháng ($)",
+                                                "OverageMinutes": "Phút vượt gói"}),
     "C05_vong_doi": tenure_line,
     "C05b_so_khach": tenure_stacked,
     "C06_tuoi_thiet_bi": lambda df: rate_bar(df, "EquipmentAgeBand", "Máy", order=_cats(df, "EquipmentAgeBand")),
     "C07_heatmap_tenure_thiet_bi": tenure_equipment_heatmap,
+    "C08_retention_funnel": retention_funnel,
     "C09_dac_diem_thiet_bi": device_grouped,
-    "C10_bien_dong_phut_goi": lambda df: rate_bar(df[df.UsageTrendBand != "Không rõ"], "UsageTrendBand", "Thay đổi phút gọi", order=_cats(df, "UsageTrendBand"), base=baseline(df)),
-    "C11_bien_dong_doanh_thu": lambda df: rate_bar(df[df.RevenueTrendBand != "Không rõ"], "RevenueTrendBand", "Thay đổi doanh thu", order=_cats(df, "RevenueTrendBand"), base=baseline(df)),
-    "C12_muc_su_dung": usage_bubble,
-    "C13_goi_gio_cao_diem": lambda df: rate_bar(df[df.PeakCallsBand != "Không rõ"], "PeakCallsBand", "Cuộc gọi giờ cao điểm", order=_cats(df, "PeakCallsBand"), horizontal=True, base=baseline(df)).update_yaxes(autorange="reversed"),
-    "C14_treemap_thoi_gian": tenure_treemap,
+    "C10_goi_cskh": lambda df: rate_bar(df, "CareCallsBand", "Số cuộc gọi CSKH", order=_cats(df, "CareCallsBand")),
+    "C11_cuoc_goi_rot": lambda df: rate_bar(df, "DroppedBand", "Số cuộc gọi rớt", order=_cats(df, "DroppedBand")),
+    "C12_goi_cuoc": overage_bubble,
+    "C13_vung": region_bar,
+    "C14_treemap_vung": region_treemap,
+    "C15_pareto_vung": region_pareto,
     "C16_tin_dung": credit_bar,
+    "C17_nhan_khau_hoc": demographic_multiples,
     "C18_tuong_quan": correlation_heatmap,
     "C19a_risk_decile": decile_bar,
     "C19b_gain_curve": gain_curve,

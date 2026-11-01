@@ -1,44 +1,63 @@
-# Kịch bản thuyết trình — thống nhất 10 biến mô hình
+# Kịch bản thuyết trình (6–8 phút)
 
-Mô hình, notebook 04 và dashboard dùng cùng 10 predictor. `Churn` là nhãn; mã khách chỉ để đối soát. Các band và điểm rủi ro được suy ra từ bộ biến này. CSV nguồn được giữ nguyên, số cột trong CSV không phải số predictor được chọn.
+Mạch kể: **Vấn đề → Nguyên nhân → Ai → Hành động**, đi đúng theo 4 trang dashboard. Mở sẵn dashboard
+(`python work/dashboard/dashboard.py` → http://127.0.0.1:8050/) và notebook `work/viz/04_eda_truc_quan.ipynb`.
+Bản hướng dẫn cũ (thiên về mô hình) vẫn còn trong lịch sử git.
 
-## 2.2. Phân tích thời gian sử dụng và thiết bị
+## 0. Mở đầu (30 giây)
 
-- `MonthsInService`: C05/C05b là đường tỷ lệ và cột chồng số khách theo tháng; C14 là treemap số khách rời bỏ theo nhóm thời gian sử dụng.
-- `CurrentEquipmentDays`: C03 phân bố tuổi máy, C04 box plot, C06 bar theo tuổi thiết bị, C07 kết hợp với thời gian sử dụng.
-- `HandsetWebCapable`: C09 grouped bar Có/Không hỗ trợ truy cập web.
-- Đỉnh quanh một năm là tín hiệu quan sát, chưa xác nhận nguyên nhân hết hợp đồng.
+> "Em đóng vai chuyên viên phân tích dữ liệu của Cell2Cell. Câu hỏi ban giám đốc đặt ra: khách nào sắp rời bỏ, vì sao, và nên giữ họ bằng cách nào.
+> Dữ liệu gồm 51.047 khách, 58 cột."
 
-## 2.3. Phân tích doanh thu, cước phí và mức sử dụng
+## 1. Xử lý dữ liệu (1 phút) — notebook mục 2–3
 
-- `MonthlyRevenue`: C04 box plot và C04b histogram chồng giữa nhóm rời bỏ/ở lại.
-- `TotalRecurringCharge`: C04c histogram chồng, C04d bar tỷ lệ rời bỏ theo nhóm phí có baseline toàn mẫu.
-- `MonthlyMinutes`: C12 bubble theo nhóm phút gọi, kích thước là số khách, trục dọc là tỷ lệ rời bỏ.
+- Dữ liệu khá sạch: missing tối đa 1,78% (C02). Giữ toàn bộ khách, không xóa dòng.
+- Chuẩn hóa: `NA` → missing, `Churn` → 0/1, `Region` = 3 ký tự đầu mã vùng, chia band (tenure, tuổi máy, cuộc gọi CSKH...).
+- 76 giá trị tuổi máy âm được gắn nhãn "Bất thường", không xóa. Outlier giữ lại vì là khách thật.
 
-## 2.4. Phân tích biến động mức sử dụng và doanh thu
+## 2. Trang Tổng quan (1 phút)
 
-- `PercChangeMinutes`: C10 bar theo các nhóm Giảm, Không đổi, Tăng.
-- `PercChangeRevenues`: C11 giữ cùng form bar và baseline.
-- Chỉ phân nhóm theo dấu của giá trị nguồn; chưa gọi đây là phần trăm thay đổi khi chưa xác nhận đơn vị. Đọc số khách và nhận xét được tính lại trong notebook.
+- KPI: **28,8%** khách rời bỏ, khoảng $849 nghìn doanh thu/tháng.
+- Biểu đồ đường: **phát hiện lớn nhất** là churn ~15% ở tháng 7–9 rồi vọt lên **44,6% ở tháng 11**, tức hết hợp đồng 1 năm.
+- Bar vùng: SEA 34% so với STL 22%. Treemap: NYC mất nhiều khách nhất về số lượng, dù rate chỉ ở mức trung bình.
+  Ý cần nói: **rate cao ≠ mất nhiều khách nhất**.
 
-## 2.5. Phân tích cuộc gọi giờ cao điểm
+## 3. Trang Nguyên nhân (1,5 phút)
 
-- `PeakCallsInOut`: C13 bar ngang theo nhóm số cuộc gọi giờ cao điểm, kèm churn trung bình.
-- Đây là số cuộc gọi giờ cao điểm, không phải số lần liên hệ CSKH hoặc hoạt động giữ chân.
+- Tuổi máy: churn tăng đều, máy > 2 năm 36,1% (gấp 1,6 lần máy mới).
+- Heatmap: khách trung thành > 36 tháng mà máy cũ vẫn churn 40%, nghĩa là **máy cũ là tín hiệu mạnh ở mọi tenure**.
+- Nghịch lý: khách **không** gọi CSKH và khách **không** có cuộc gọi rớt lại churn cao nhất. Khách im lặng/ít dùng mới đáng lo,
+  không phải khách hay phàn nàn.
+- Bubble gói cước: dùng quá ít hoặc vượt gói nhiều đều rủi ro, nên cần tư vấn đúng gói.
+- Thao tác demo: chọn bộ lọc **Thời gian sử dụng = 13–18 tháng**, KPI và mọi biểu đồ cập nhật theo. Bấm **Xóa lọc**.
 
-## 2.6. Phân tích hạng tín dụng khách hàng
+## 4. Trang Chân dung & rủi ro (1,5 phút)
 
-- `CreditRating`: C16 giữ đúng thứ tự hạng 1–7. Không suy diễn thu nhập, nghề nghiệp hoặc hôn nhân từ hạng tín dụng.
+- Funnel: khách đã nhận ưu đãi giữ chân **vẫn churn 41%**, tức chương trình hiện tại không giữ được khách.
+- Mô hình (CatBoost 52 cột): decile 10 churn 56%. Gain curve: liên hệ 20% khách rủi ro nhất bắt được 34% khách sẽ rời bỏ.
+- Tín dụng tốt churn cao hơn; nhân khẩu học (thu nhập, nghề, hôn nhân) chênh rất ít, nên **chọn khách theo hành vi, không theo nhân khẩu**.
 
-## 2.7. Phân tích tương quan giữa các biến
+## 5. Trang Hành động (1,5 phút)
 
-- C18 có đúng 10 predictor cộng nhãn rời bỏ. Hai biến phân loại được mã hóa rõ trong notebook.
-- Tương quan tuyến tính không phải mức độ quan trọng trong CatBoost và không chứng minh nhân quả.
+- Bubble matrix: 4 phân khúc cần can thiệp đều nằm bên phải đường trung bình. Tổng cộng 25.319 khách, ≈ $534 nghìn/tháng bị đe dọa.
+- Đọc 4 thẻ chính sách theo thứ tự ưu tiên:
+  1. **Đã báo động**: thiết kế lại ưu đãi.
+  2. **Hết hợp đồng**: gọi từ tháng 10, ưu đãi gia hạn. Đây là nhóm có doanh thu bị đe dọa lớn nhất.
+  3. **Máy cũ**: đổi máy trả góp gắn cam kết.
+  4. **Rủi ro cao (mô hình)**: tư vấn gói, ưu đãi cá nhân hóa.
 
-## Mô hình và hành động
+## 6. Kết luận (30 giây)
 
-- Mô hình đã chạy dùng 10 biến: ROC-AUC ngoài mẫu 0,6725, AP 0,4549, lift top 10% toàn nguồn 1,88×. Việc thay biểu đồ không huấn luyện lại hoặc đổi điểm.
-- C19 dùng điểm đó để phân tầng và đánh giá phạm vi liên hệ. C20/C20b/C20c giữ nguyên các nhóm Hết hợp đồng, Máy cũ, Rủi ro cao theo mô hình và Ổn định.
-- Chính sách cần thử nghiệm đối chứng; doanh thu tháng bị đe dọa chưa phải số tiền chắc chắn giữ được.
+> "Ba đòn bẩy chính: **thời điểm hết hợp đồng, tuổi thiết bị, và chất lượng của chương trình giữ chân**.
+> Các đề xuất dựa trên tương quan quan sát nên cần A/B test trước khi triển khai rộng, bắt đầu ở 20 vùng chiếm 80% khách rời bỏ."
 
-Các biểu đồ chỉ dùng biến ngoài mô hình đã được bỏ khỏi notebook và dashboard; không giữ ô thông báo trống.
+## Câu hỏi có thể gặp
+
+| Câu hỏi | Trả lời |
+|---|---|
+| Vì sao không xóa missing? | Missing ≤ 1,8%; mỗi biểu đồ chỉ loại missing của cột đang xét để giữ đúng mẫu số |
+| Vì sao chia band như vậy? | Ngưỡng có nghĩa kinh doanh (6 tháng, 1 năm, 2 năm); band thể hiện trong `prepare_viz_data.py` |
+| Đỉnh tháng 11 có chắc là hết hợp đồng? | Là giả thuyết hợp lý nhất (dữ liệu không có cột hợp đồng); cần xác nhận với bộ phận kinh doanh |
+| Doanh thu bị đe dọa tính thế nào? | Tổng `MonthlyRevenue` của nhóm × churn rate của nhóm; là doanh thu, không phải lợi nhuận |
+| Vì sao bỏ nhóm "Sai gói"? | Sau khi tách các nhóm ưu tiên trước, nhóm này churn dưới trung bình (24%) nên không đáng can thiệp riêng |
+| Mô hình tốt cỡ nào? | ROC-AUC ≈ 0,68 (bản 10 cột 0,67; Logistic 0,61; LightGBM ngang): đủ để xếp hạng ưu tiên, chưa đủ để dự đoán từng khách. Trần của bộ dữ liệu khoảng 0,68–0,70 |
